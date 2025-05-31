@@ -59,28 +59,60 @@ const Calendar: React.FC = () => {
       // };
 
   useEffect(() => {
+    const fetchEvents = async () => {
+      const response = await fetch('/api/events', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await response.json()
+
+      // Transform the data to FullCalendar's expected format
+      const formattedEvents = data.map(event => ({
+        ...event,
+        id: event.id,
+        title: event.title,
+        start: event.start_time, // must be ISO string
+        end: event.end_time,     // must be ISO string
+        allDay: false,
+        extendedProps: {
+          calendar: event.color,
+          instructor: event.instructor,
+          classPax: event.class_pax,
+          waitlist: event.waitlist,
+          repeat: event.repeat,
+          repeatDays: event.repeat_days,
+        },
+      }))
+
+      setEvents(formattedEvents)
+      console.log("List of events:", formattedEvents)
+    }
+    fetchEvents()
     // Initialize with some events
-    setEvents([
-      {
-        id: "1",
-        title: "Event Conf.",
-        start: new Date().toISOString().split("T")[0],
-        extendedProps: { calendar: "Danger" },
-      },
-      {
-        id: "2",
-        title: "Meeting",
-        start: new Date(Date.now() + 86400000).toISOString().split("T")[0],
-        extendedProps: { calendar: "Success" },
-      },
-      {
-        id: "3",
-        title: "Workshop",
-        start: new Date(Date.now() + 172800000).toISOString().split("T")[0],
-        end: new Date(Date.now() + 259200000).toISOString().split("T")[0],
-        extendedProps: { calendar: "Primary" },
-      },
-    ]);
+    // setEvents([
+
+    //   {
+    //     id: "1",
+    //     title: "Event Conf.",
+    //     start: '2025-06-10T00:00:00.000Z',
+    //     end: '2025-06-10T09:00:00.000Z',
+    //     allDay: false,
+    //     extendedProps: { calendar: "Danger",  },
+    //   },
+    //   {
+    //     id: "2",
+    //     title: "Meeting",
+    //     start: new Date(Date.now() + 86400000).toISOString().split("T")[0],
+    //     extendedProps: { calendar: "Success" },
+    //   },
+    //   {
+    //     id: "3",
+    //     title: "Workshop",
+    //     start: new Date(Date.now() + 172800000).toISOString().split("T")[0],
+    //     end: new Date(Date.now() + 259200000).toISOString().split("T")[0],
+    //     extendedProps: { calendar: "Primary" },
+    //   },
+    // ]);
   }, []);
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -170,7 +202,7 @@ const Calendar: React.FC = () => {
       <div className="custom-calendar">
         <FullCalendar
           ref={calendarRef}
-          timeZone="Asia/Singapore"
+          timeZone="local"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
           headerToolbar={{
@@ -178,6 +210,8 @@ const Calendar: React.FC = () => {
             center: "title",
             right: "dayGridMonth,timeGridWeek,timeGridDay",
           }}
+          slotMinTime="07:00:00"
+          slotMaxTime="23:00:00"
           events={events}
           selectable={true}
           nowIndicator={true}
@@ -211,7 +245,7 @@ const Calendar: React.FC = () => {
               <input
                 type="text"
                 className="w-full border rounded-lg px-4 py-2 pr-10 text-base"
-                placeholder="Hot Yoga"
+                placeholder="Pilates Class"
                 value={eventTitle}
                 onChange={(e) => setEventTitle(e.target.value)}
               />
