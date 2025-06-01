@@ -23,6 +23,19 @@ interface CalendarEvent extends EventInput {
   };
 }
 
+interface Event {
+  id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  color: string;
+  instructor: string;
+  class_pax: number;
+  waitlist: number;
+  repeat: string;
+  repeat_days: number[];
+}
+
 const Calendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null
@@ -67,7 +80,7 @@ const Calendar: React.FC = () => {
       const data = await response.json()
 
       // Transform the data to FullCalendar's expected format
-      const formattedEvents = data.map(event => ({
+      const formattedEvents = data.map((event: Event) => ({
         ...event,
         id: event.id,
         title: event.title,
