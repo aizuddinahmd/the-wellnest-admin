@@ -12,17 +12,7 @@ import { useRouter } from "next/navigation";
 // ]
 
 export const ServicesCard = () => {
-  const [modalCategory, setModalCategory] = useState<string | null>(null);
-  const [newClassName, setNewClassName] = useState("");
   const router = useRouter();
-  const handleOpenModal = (category: string) => {
-    setModalCategory(category);
-  };
-
-  const handleCloseModal = () => {
-    setModalCategory(null);
-    setNewClassName("");
-  };
 
   // const handleClassCreate = (e: React.FormEvent) => {
   // 	e.preventDefault()

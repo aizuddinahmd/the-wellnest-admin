@@ -24,6 +24,7 @@ export async function POST(request: Request) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
+    console.log("Course created:", data);
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {

@@ -9,9 +9,10 @@ import { useDropzone } from "react-dropzone";
 
 export default function CreateServicesForm() {
   const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
+    { value: "Pilates", label: "Pilates" },
+    { value: "Physio", label: "Physio" },
+    { value: "Rehab", label: "Rehab" },
+    { value: "Strength", label: "Strength" },
   ];
 
   // Form state
@@ -86,11 +87,11 @@ export default function CreateServicesForm() {
             <div className="space-y-6">
               <div>
                 <Label>Name</Label>
-                <Input type="text" value={name} onChange={e => setName(e.target.value)} required />
+                <Input type="text" value={name} onChange={e => setName(e.target.value)}/>
               </div>
               <div>
                 <Label>Description</Label>
-                <Input type="text" placeholder="Enter description" value={description} onChange={e => setDescription(e.target.value)} required />
+                <Input type="text" placeholder="Enter description" value={description} onChange={e => setDescription(e.target.value)}/>
               </div>
               <div>
                 <Label>Category</Label>
@@ -99,7 +100,7 @@ export default function CreateServicesForm() {
                     options={options}
                     placeholder="Select an option"
                     onChange={handleSelectChange}
-                    value={category}
+                    // value={category}
                     className="dark:bg-dark-900"
                   />
                   <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
@@ -173,7 +174,7 @@ export default function CreateServicesForm() {
           <div className="space-y-6">
             <div>
               <Label>Price (RM)</Label>
-              <Input type="number" placeholder="Enter price" value={price} onChange={e => setPrice(e.target.value)} required />
+              <Input type="number" placeholder="Enter price" value={price} onChange={e => setPrice(e.target.value)}/>
             </div>
           </div>
         </ComponentCard>

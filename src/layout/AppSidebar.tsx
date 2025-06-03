@@ -10,7 +10,7 @@ import {
   ChevronDownIcon,
   // GridIcon,
   HorizontaLDots,
-  ListIcon,
+  // ListIcon,
   // PageIcon,
   // PieChartIcon,
   PlugInIcon,
@@ -117,8 +117,8 @@ const othersItems: NavItem[] = [
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Sign In", path: "/signin"},
+      { name: "Sign Up", path: "/signup"},
     ],
   },
 ];
@@ -230,17 +230,7 @@ const AppSidebar: React.FC = () => {
                             new
                           </span>
                         )}
-                        {subItem.pro && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
-                          >
-                            pro
-                          </span>
-                        )}
+                      
                       </span>
                     </Link>
                   </li>
