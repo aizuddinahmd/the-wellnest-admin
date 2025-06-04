@@ -61,6 +61,7 @@ const Calendar: React.FC = () => {
   const [startTime, setStartTime] = useState<Date | null>(
     new Date(new Date().setHours(8, 0, 0, 0)),
   );
+  const [courseOptions, setCourseOptions] = useState<string[]>([]);
 
   const weekLabels = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -70,6 +71,21 @@ const Calendar: React.FC = () => {
   //   Primary: "primary",
   //   Warning: "warning",
   // };
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("/api/course", { method: "GET" });
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setCourseOptions(data.map((course) => course.title));
+        }
+      } catch (err) {
+        console.error("Failed to fetch courses", err);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -260,17 +276,20 @@ const Calendar: React.FC = () => {
       >
         <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
           <h2 className="mb-8 text-2xl font-bold">Add schedule</h2>
-          {/* Class input */}
+          {/* Class input as dropdown */}
           <div className="mb-4">
             <label className="mb-1 block font-semibold">Class</label>
             <div className="relative">
-              <input
-                type="text"
+              <select
                 className="w-full rounded-lg border px-4 py-2 pr-10 text-base"
-                placeholder="Pilates Class"
                 value={eventTitle}
                 onChange={(e) => setEventTitle(e.target.value)}
-              />
+              >
+                <option value="">Select a class</option>
+                {courseOptions.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
               <Search className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
             </div>
           </div>

@@ -39,17 +39,17 @@ const navItems: NavItem[] = [
   {
     icon: <LayoutDashboard strokeWidth={1.5} />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/" }],
-  },
-  {
-    icon: <Calendar strokeWidth={1.5} />,
-    name: "Schedule",
-    path: "/schedule",
+    subItems: [{ name: "Registration", path: "/" }],
   },
   {
     icon: <Dumbbell strokeWidth={1.5} />,
     name: "Services",
     path: "/services",
+  },
+  {
+    icon: <Calendar strokeWidth={1.5} />,
+    name: "Schedule",
+    path: "/schedule",
   },
   {
     icon: <Users strokeWidth={1.5} />,
