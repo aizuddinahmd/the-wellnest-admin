@@ -1,6 +1,6 @@
 "use client"
+import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface Booking {
   id: string
@@ -157,7 +157,7 @@ export default function HomePage() {
               <tr key={b.id}>
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">
-                    <img
+                    <Image
                       src={`https://randomuser.me/api/portraits/${idx % 2 === 0 ? 'men' : 'women'}/${40 + idx}.jpg`}
                       alt={b.patient}
                       className="h-10 w-10 rounded-full object-cover"
