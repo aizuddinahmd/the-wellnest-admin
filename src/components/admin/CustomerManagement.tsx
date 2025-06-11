@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface Customer {
   id: string
@@ -7,6 +7,12 @@ interface Customer {
   email: string
   status: string
   registrationDate: string
+}
+
+interface Event {
+  id: string
+  title: string
+  start_time: string
 }
 
 const mockCustomers: Customer[] = [
@@ -36,10 +42,70 @@ const mockCustomers: Customer[] = [
   },
 ]
 
+function isToday(dateStr: string) {
+  const d = new Date(dateStr)
+  const today = new Date()
+  return (
+    d.getFullYear() === today.getFullYear() &&
+    d.getMonth() === today.getMonth() &&
+    d.getDate() === today.getDate()
+  )
+}
+
 export default function CustomerManagement() {
+  const [showModal, setShowModal] = useState(false)
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    eventId: '',
+  })
+  const [eventsToday, setEventsToday] = useState<Event[]>([])
+
+  useEffect(() => {
+    if (!showModal) return
+    const fetchEvents = async () => {
+      try {
+        const res = await fetch('/api/events')
+        const data = await res.json()
+        if (Array.isArray(data)) {
+          setEventsToday(data.filter((e: Event) => isToday(e.start_time)))
+        } else {
+          setEventsToday([])
+        }
+      } catch {
+        setEventsToday([])
+      }
+    }
+    fetchEvents()
+  }, [showModal])
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setShowModal(false)
+    // For now, just log the data
+    console.log('Register customer:', form)
+    setForm({ name: '', phone: '', email: '', eventId: '' })
+  }
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow">
-      <div className="mb-4 text-xl font-bold">Customer Management</div>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="text-xl font-bold">Customer Management</div>
+        <button
+          className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
+          onClick={() => setShowModal(true)}
+        >
+          Register
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
@@ -84,6 +150,91 @@ export default function CustomerManagement() {
           </tbody>
         </table>
       </div>
+      {/* Registration Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowModal(false)}
+            >
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M6 6l12 12M6 18L18 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+            <h3 className="mb-6 text-lg font-bold">Register New Customer</h3>
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleFormChange}
+                  className="w-full rounded border px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleFormChange}
+                  className="w-full rounded border px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleFormChange}
+                  className="w-full rounded border px-3 py-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">
+                  Event for Today
+                </label>
+                <select
+                  name="eventId"
+                  value={form.eventId}
+                  onChange={handleFormChange}
+                  className="w-full rounded border px-3 py-2"
+                  required
+                >
+                  <option value="">Select an event</option>
+                  {eventsToday.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="submit"
+                  className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
+                >
+                  Register
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
