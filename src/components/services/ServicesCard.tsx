@@ -13,8 +13,8 @@ import { useRouter } from 'next/navigation'
 
 interface Service {
   id: string
-  title: string
-  price: number
+  name: string
+  base_price: number
   category: string
 }
 
