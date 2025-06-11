@@ -42,6 +42,7 @@ export default function EventsToday() {
           setEvents([])
         }
       } catch (err) {
+        console.error('Error fetching events:', err)
         setEvents([])
       } finally {
         setLoading(false)

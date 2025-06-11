@@ -74,6 +74,10 @@ const Calendar: React.FC = () => {
   // };
 
   useEffect(() => {
+    console.log('eventEndDate:', eventEndDate)
+  }, [eventEndDate])
+
+  useEffect(() => {
     const fetchServices = async () => {
       try {
         const res = await fetch('/api/services', { method: 'GET' })
@@ -131,6 +135,10 @@ const Calendar: React.FC = () => {
       if (found) setDuration(found.duration_minutes)
     }
   }, [eventTitle, serviceOptions])
+
+  useEffect(() => {
+    console.log('eventEndDate:', eventEndDate)
+  }, [eventEndDate])
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     resetModalFields()
@@ -216,7 +224,7 @@ const Calendar: React.FC = () => {
   const resetModalFields = () => {
     setEventTitle('')
     setEventStartDate(null)
-    setEventEndDate('')
+    setEventEndDate(null)
     setEventLevel('')
     setColorOpen(false)
     setSelectedEvent(null)
