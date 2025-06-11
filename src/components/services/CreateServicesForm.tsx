@@ -20,7 +20,7 @@ export default function CreateServicesForm() {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState(options[0].value)
   const [price, setPrice] = useState('')
-  const [duration, setDuration] = useState('')
+  const [duration, setDuration] = useState(0)
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -57,7 +57,7 @@ export default function CreateServicesForm() {
           name,
           description,
           category,
-          duration_minutes: duration ? parseInt(duration) : 60,
+          duration_minutes: duration,
           base_price: price ? parseFloat(price) : 0,
           image_url: imageUrl,
         }),
@@ -71,7 +71,7 @@ export default function CreateServicesForm() {
         setDescription('')
         setCategory(options[0].value)
         setPrice('')
-        setDuration('')
+        setDuration(0)
         setImageUrl('')
       }
     } catch (err) {
@@ -126,9 +126,9 @@ export default function CreateServicesForm() {
                   type="number"
                   placeholder="Enter duration in minutes"
                   value={duration || ''}
-                  onChange={(e) => setDuration(e.target.value)}
-                  min={1}
-                  required
+                  onChange={(e) => setDuration(Number(e.target.value))}
+                  min="1"
+                  // required
                 />
               </div>
             </div>
