@@ -40,7 +40,7 @@ const Calendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [eventTitle, setEventTitle] = useState('')
   const [eventStartDate, setEventStartDate] = useState<Date | null>(null)
-  const [eventEndDate, setEventEndDate] = useState('')
+  const [eventEndDate, setEventEndDate] = useState<Date | null>(null)
   const [eventLevel, setEventLevel] = useState('')
   const [dailyTime, setDailyTime] = useState<Date | null>(null)
   const [showDatePicker, setShowDatePicker] = useState(false)
@@ -59,8 +59,10 @@ const Calendar: React.FC = () => {
   const [startTime, setStartTime] = useState<Date | null>(
     new Date(new Date().setHours(8, 0, 0, 0)),
   )
-  const [courseOptions, setCourseOptions] = useState<string[]>([])
-  const [duration, setDuration] = useState(60)
+  const [serviceOptions, setServiceOptions] = useState<
+    { name: string; duration_minutes: number }[]
+  >([])
+  const [duration, setDuration] = useState(0)
 
   const weekLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
@@ -72,18 +74,23 @@ const Calendar: React.FC = () => {
   // };
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchServices = async () => {
       try {
-        const res = await fetch('/api/course', { method: 'GET' })
+        const res = await fetch('/api/services', { method: 'GET' })
         const data = await res.json()
         if (Array.isArray(data)) {
-          setCourseOptions(data.map((course) => course.title))
+          setServiceOptions(
+            data.map((service) => ({
+              name: service.name,
+              duration_minutes: service.duration_minutes,
+            })),
+          )
         }
       } catch (err) {
-        console.error('Failed to fetch courses', err)
+        console.error('Failed to fetch services', err)
       }
     }
-    fetchCourses()
+    fetchServices()
   }, [])
 
   useEffect(() => {
@@ -116,32 +123,14 @@ const Calendar: React.FC = () => {
       console.log('List of events:', formattedEvents)
     }
     fetchEvents()
-    // Initialize with some events
-    // setEvents([
-
-    //   {
-    //     id: "1",
-    //     title: "Event Conf.",
-    //     start: '2025-06-10T00:00:00.000Z',
-    //     end: '2025-06-10T09:00:00.000Z',
-    //     allDay: false,
-    //     extendedProps: { calendar: "Danger",  },
-    //   },
-    //   {
-    //     id: "2",
-    //     title: "Meeting",
-    //     start: new Date(Date.now() + 86400000).toISOString().split("T")[0],
-    //     extendedProps: { calendar: "Success" },
-    //   },
-    //   {
-    //     id: "3",
-    //     title: "Workshop",
-    //     start: new Date(Date.now() + 172800000).toISOString().split("T")[0],
-    //     end: new Date(Date.now() + 259200000).toISOString().split("T")[0],
-    //     extendedProps: { calendar: "Primary" },
-    //   },
-    // ]);
   }, [])
+
+  useEffect(() => {
+    if (eventTitle) {
+      const found = serviceOptions.find((s) => s.name === eventTitle)
+      if (found) setDuration(found.duration_minutes)
+    }
+  }, [eventTitle, serviceOptions])
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     resetModalFields()
@@ -149,7 +138,7 @@ const Calendar: React.FC = () => {
       selectInfo.startStr ? new Date(selectInfo.startStr) : null,
     )
     setStartTime(selectInfo.startStr ? new Date(selectInfo.startStr) : null)
-    setEventEndDate(selectInfo.endStr || selectInfo.startStr)
+    setEventEndDate(selectInfo.endStr ? new Date(selectInfo.endStr) : null)
     openModal()
   }
 
@@ -159,11 +148,7 @@ const Calendar: React.FC = () => {
     setEventStartDate(
       clickInfo.event.start ? new Date(clickInfo.event.start) : null,
     )
-    setEventEndDate(
-      clickInfo.event.end
-        ? clickInfo.event.end.toISOString().split('T')[0]
-        : '',
-    )
+    setEventEndDate(clickInfo.event.end ? new Date(clickInfo.event.end) : null)
     setEventLevel(clickInfo.event.extendedProps.calendar)
     openModal()
   }
@@ -174,20 +159,28 @@ const Calendar: React.FC = () => {
     combined.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0)
     return combined
   }
+  const getEndTime = () => {
+    const start = getCombinedDateTime()
+    if (!start || !duration) return null
+    const end = new Date(start)
+    end.setMinutes(end.getMinutes() + duration)
+    return end
+  }
 
   const handleAddOrUpdateEvent = async () => {
     const eventStart = getCombinedDateTime()
+    const eventEnd = getEndTime()
+
     const eventData = {
       title: eventTitle,
       start_time: eventStart ? eventStart.toISOString() : null,
-      end_time: eventEndDate ? new Date(eventEndDate).toISOString() : null,
-      instructor,
-      class_pax: classPax,
+      end_time: eventEnd ? eventEnd.toISOString() : null,
+      // instructor,
+      capacity: classPax,
       waitlist,
-      color: eventLevel, // or your color state
+      color: eventLevel,
       repeat,
       repeat_days: weeklyDays,
-      duration,
     }
 
     // Save to database
@@ -286,9 +279,9 @@ const Calendar: React.FC = () => {
                 onChange={(e) => setEventTitle(e.target.value)}
               >
                 <option value="">Select a class</option>
-                {courseOptions.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
+                {serviceOptions.map((service) => (
+                  <option key={service.name} value={service.name}>
+                    {service.name}
                   </option>
                 ))}
               </select>
