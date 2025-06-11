@@ -1,8 +1,8 @@
-"use client";
-import React, { useState, useEffect } from "react";
+'use client'
+import React, { useState, useEffect } from 'react'
 // import FullScreenModal from '../example/ModalExample/FullScreenModal';
 // import FormInModal from '../example/ModalExample/FormInModal';
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation'
 
 // const Categories = [
 // 	{ name: 'Massage', items: 1 },
@@ -11,39 +11,39 @@ import { useRouter } from "next/navigation";
 // 	{ name: 'Reformer Pilates', items: 2 },
 // ]
 
-interface Course {
-  id: string;
-  title: string;
-  price: number;
-  category: string;
+interface Service {
+  id: string
+  title: string
+  price: number
+  category: string
 }
 
 export const ServicesCard = () => {
-  const router = useRouter();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter()
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchCourses = async () => {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
       try {
-        const res = await fetch("/api/course");
-        const data = await res.json();
+        const res = await fetch('/api/services')
+        const data = await res.json()
         if (Array.isArray(data)) {
-          setCourses(data);
+          setServices(data)
         } else {
-          setError("Failed to fetch courses");
+          setError('Failed to fetch courses')
         }
       } catch {
-        setError("Failed to fetch courses");
+        setError('Failed to fetch courses')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchCourses();
-  }, []);
+    }
+    fetchCourses()
+  }, [])
 
   // const handleClassCreate = (e: React.FormEvent) => {
   // 	e.preventDefault()
@@ -59,15 +59,17 @@ export const ServicesCard = () => {
           Services
         </h3>
         <button
-          onClick={() => router.push("/services/create-services")}
-          className="rounded-md bg-[#355c4a] hover:bg-[#355c4a]/80 px-4 py-2 text-white"
+          onClick={() => router.push('/services/create-services')}
+          className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
         >
           Add Service
         </button>
       </div>
       {/* Courses Table */}
       <div className="mt-8">
-        <h4 className="mb-4 text-base font-semibold text-gray-700 dark:text-white/80">Available Courses</h4>
+        <h4 className="mb-4 text-base font-semibold text-gray-700 dark:text-white/80">
+          Available Services
+        </h4>
         {loading ? (
           <div className="py-8 text-center text-gray-500">Loading...</div>
         ) : error ? (
@@ -77,27 +79,41 @@ export const ServicesCard = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">Name</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">Price</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">Category</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">
+                    Name
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">
+                    Price
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">
+                    Category
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {courses.map((course) => (
-                  <tr key={course.id}>
-                    <td className="px-4 py-2 text-gray-800 dark:text-white/90">{course.title}</td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-white/80">RM {course.price}</td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-white/80">{course.category}</td>
+                {services.map((service) => (
+                  <tr key={service.id}>
+                    <td className="px-4 py-2 text-gray-800 dark:text-white/90">
+                      {service.name}
+                    </td>
+                    <td className="px-4 py-2 text-gray-700 dark:text-white/80">
+                      RM {service.base_price}
+                    </td>
+                    <td className="px-4 py-2 text-gray-700 dark:text-white/80">
+                      {service.category}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            {courses.length === 0 && (
-              <div className="py-8 text-center text-gray-500">No courses found.</div>
+            {services.length === 0 && (
+              <div className="py-8 text-center text-gray-500">
+                No services found.
+              </div>
             )}
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}

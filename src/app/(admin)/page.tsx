@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 
@@ -102,7 +102,9 @@ export default function HomePage() {
     return true
   })
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
   }
@@ -115,10 +117,10 @@ export default function HomePage() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div className="text-2xl font-bold">Bookings for Today</div>
         <button
-          className="rounded bg-black px-6 py-2 text-white font-semibold hover:bg-gray-800"
+          className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
           onClick={() => setShowModal(true)}
         >
           Register
@@ -131,7 +133,7 @@ export default function HomePage() {
             key={tab.value}
             className={`pb-2 text-base font-semibold transition-colors ${
               activeTab === tab.value
-                ? 'text-black border-b-2 border-black'
+                ? 'border-b-2 border-black text-black'
                 : 'text-gray-500'
             }`}
             style={{ borderBottomWidth: activeTab === tab.value ? 2 : 0 }}
@@ -141,15 +143,25 @@ export default function HomePage() {
           </button>
         ))}
       </div>
-      <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow mb-8">
+      <div className="mb-8 overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">User</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">Phone</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">Email</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">Status</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">Booking Date</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">
+                User
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">
+                Phone
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">
+                Email
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500">
+                Booking Date
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -158,22 +170,36 @@ export default function HomePage() {
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">
                     <Image
-                      src={`https://randomuser.me/api/portraits/${idx % 2 === 0 ? 'men' : 'women'}/${40 + idx}.jpg`}
+                      src={`https://randomuser.me/api/portraits/men/40.jpg`}
                       alt={b.patient}
                       className="h-10 w-10 rounded-full object-cover"
+                      width={40}
+                      height={40}
                     />
                     <div>
-                      <div className="font-semibold text-gray-900">{b.patient}</div>
+                      <div className="font-semibold text-gray-900">
+                        {b.patient}
+                      </div>
                       <div className="text-xs text-gray-500">{b.age}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-4 text-gray-700">{b.phone || '012-3456789'}</td>
-                <td className="px-4 py-4 text-gray-700">{b.email || 'user@example.com'}</td>
-                <td className="px-4 py-4">
-                  <span className={`inline-block rounded px-3 py-1 text-xs font-semibold ${b.statusColor}`}>{b.status}</span>
+                <td className="px-4 py-4 text-gray-700">
+                  {b.phone || '012-3456789'}
                 </td>
-                <td className="px-4 py-4 text-gray-700">{b.arriveAt.split('\n')[0]}</td>
+                <td className="px-4 py-4 text-gray-700">
+                  {b.email || 'user@example.com'}
+                </td>
+                <td className="px-4 py-4">
+                  <span
+                    className={`inline-block rounded px-3 py-1 text-xs font-semibold ${b.statusColor}`}
+                  >
+                    {b.status}
+                  </span>
+                </td>
+                <td className="px-4 py-4 text-gray-700">
+                  {b.arriveAt.split('\n')[0]}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -182,17 +208,24 @@ export default function HomePage() {
       {/* Registration Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
+          <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
               onClick={() => setShowModal(false)}
             >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M6 6l12 12M6 18L18 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
             </button>
-            <h3 className="text-lg font-bold mb-6">Register New Booking</h3>
+            <h3 className="mb-6 text-lg font-bold">Register New Booking</h3>
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
+                <label className="mb-1 block text-sm font-medium">Name</label>
                 <input
                   type="text"
                   name="name"
@@ -203,7 +236,9 @@ export default function HomePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Phone Number</label>
+                <label className="mb-1 block text-sm font-medium">
+                  Phone Number
+                </label>
                 <input
                   type="tel"
                   name="phone"
@@ -214,7 +249,7 @@ export default function HomePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="mb-1 block text-sm font-medium">Email</label>
                 <input
                   type="email"
                   name="email"
@@ -225,7 +260,9 @@ export default function HomePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Service Booking</label>
+                <label className="mb-1 block text-sm font-medium">
+                  Service Booking
+                </label>
                 <select
                   name="service"
                   value={form.service}
@@ -234,14 +271,16 @@ export default function HomePage() {
                   required
                 >
                   {mockServices.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
                   ))}
                 </select>
               </div>
-              <div className="flex justify-end mt-6">
+              <div className="mt-6 flex justify-end">
                 <button
                   type="submit"
-                  className="rounded bg-black px-6 py-2 text-white font-semibold hover:bg-gray-800"
+                  className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
                 >
                   Register
                 </button>
@@ -252,4 +291,4 @@ export default function HomePage() {
       )}
     </div>
   )
-} 
+}

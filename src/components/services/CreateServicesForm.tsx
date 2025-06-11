@@ -1,83 +1,86 @@
-"use client";
-import { useState } from "react";
-import { ChevronDownIcon } from "@/icons";
-import ComponentCard from "../common/ComponentCard";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import Select from "../form/Select";
-import { useDropzone } from "react-dropzone";
+'use client'
+import { useState } from 'react'
+import { ChevronDownIcon } from '@/icons'
+import ComponentCard from '../common/ComponentCard'
+import Input from '../form/input/InputField'
+import Label from '../form/Label'
+import Select from '../form/Select'
+import { useDropzone } from 'react-dropzone'
 
 export default function CreateServicesForm() {
   const options = [
-    { value: "Pilates", label: "Pilates" },
-    { value: "Physio", label: "Physio" },
-    { value: "Rehab", label: "Rehab" },
-    { value: "Strength", label: "Strength" },
-  ];
+    { value: 'Pilates', label: 'Pilates' },
+    { value: 'Physio', label: 'Physio' },
+    { value: 'Rehab', label: 'Rehab' },
+    { value: 'Strength', label: 'Strength' },
+  ]
 
   // Form state
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(options[0].value);
-  const [price, setPrice] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [category, setCategory] = useState(options[0].value)
+  const [price, setPrice] = useState('')
+  const [duration, setDuration] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
 
   const handleSelectChange = (value: string) => {
-    setCategory(value);
-  };
+    setCategory(value)
+  }
 
   const onDrop = (acceptedFiles: File[]) => {
     // For demo, just use the file name as image_url
     if (acceptedFiles.length > 0) {
-      setImageUrl(acceptedFiles[0].name);
+      setImageUrl(acceptedFiles[0].name)
     }
-  };
+  }
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "image/png": [],
-      "image/jpeg": [],
-      "image/webp": [],
-      "image/svg+xml": [],
+      'image/png': [],
+      'image/jpeg': [],
+      'image/webp': [],
+      'image/svg+xml': [],
     },
-  });
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
     try {
-      const res = await fetch("/api/course", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: name,
+          name,
           description,
           category,
-          price: price ? parseFloat(price) : 0,
+          duration_minutes: duration ? parseInt(duration) : 60,
+          base_price: price ? parseFloat(price) : 0,
           image_url: imageUrl,
         }),
-      });
+      })
       if (!res.ok) {
-        const err = await res.json();
-        setMessage(err.error || "Failed to create service");
+        const err = await res.json()
+        setMessage(err.error || 'Failed to create service')
       } else {
-        setMessage("Service created successfully!");
-        setName("");
-        setDescription("");
-        setCategory(options[0].value);
-        setPrice("");
-        setImageUrl("");
+        setMessage('Service created successfully!')
+        setName('')
+        setDescription('')
+        setCategory(options[0].value)
+        setPrice('')
+        setDuration('')
+        setImageUrl('')
       }
     } catch (err) {
-      console.error("Error creating course:", err);
-      setMessage("An error occurred. Please try again.");
+      console.error('Error creating service:', err)
+      setMessage('An error occurred. Please try again.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -87,11 +90,20 @@ export default function CreateServicesForm() {
             <div className="space-y-6">
               <div>
                 <Label>Name</Label>
-                <Input type="text" value={name} onChange={e => setName(e.target.value)}/>
+                <Input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div>
                 <Label>Description</Label>
-                <Input type="text" placeholder="Enter description" value={description} onChange={e => setDescription(e.target.value)}/>
+                <Input
+                  type="text"
+                  placeholder="Enter description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
               </div>
               <div>
                 <Label>Category</Label>
@@ -108,6 +120,17 @@ export default function CreateServicesForm() {
                   </span>
                 </div>
               </div>
+              <div>
+                <Label>Duration (minutes)</Label>
+                <Input
+                  type="number"
+                  placeholder="Enter duration in minutes"
+                  value={duration || ''}
+                  onChange={(e) => setDuration(e.target.value)}
+                  min={1}
+                  required
+                />
+              </div>
             </div>
           </ComponentCard>
         </div>
@@ -118,8 +141,8 @@ export default function CreateServicesForm() {
                 {...getRootProps()}
                 className={`dropzone rounded-xl border-dashed border-gray-300 p-7 lg:p-10 ${
                   isDragActive
-                    ? "border-brand-500 bg-gray-100 dark:bg-gray-800"
-                    : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+                    ? 'border-brand-500 bg-gray-100 dark:bg-gray-800'
+                    : 'border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900'
                 } `}
                 id="demo-upload"
               >
@@ -149,8 +172,8 @@ export default function CreateServicesForm() {
                   {/* Text Content */}
                   <h4 className="text-theme-xl mb-3 font-semibold text-gray-800 dark:text-white/90">
                     {isDragActive
-                      ? "Drop Files Here"
-                      : "Drag & Drop Files Here"}
+                      ? 'Drop Files Here'
+                      : 'Drag & Drop Files Here'}
                   </h4>
 
                   <span className="mb-5 block w-full max-w-[290px] text-center text-sm text-gray-700 dark:text-gray-400">
@@ -161,7 +184,9 @@ export default function CreateServicesForm() {
                     Browse File
                   </span>
                   {imageUrl && (
-                    <div className="mt-2 text-xs text-gray-500">Selected: {imageUrl}</div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      Selected: {imageUrl}
+                    </div>
                   )}
                 </div>
               </div>
@@ -174,23 +199,32 @@ export default function CreateServicesForm() {
           <div className="space-y-6">
             <div>
               <Label>Price (RM)</Label>
-              <Input type="number" placeholder="Enter price" value={price} onChange={e => setPrice(e.target.value)}/>
+              <Input
+                type="number"
+                placeholder="Enter price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
             </div>
           </div>
         </ComponentCard>
       </div>
       {message && (
-        <div className={`mt-6 rounded p-3 text-sm ${message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{message}</div>
+        <div
+          className={`mt-6 rounded p-3 text-sm ${message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+        >
+          {message}
+        </div>
       )}
       <div className="mt-8 flex justify-end">
         <button
           type="submit"
-          className="rounded bg-[#355c4a] px-6 py-2 text-white font-semibold hover:bg-[#355c4a]/80 disabled:opacity-60"
+          className="rounded bg-[#355c4a] px-6 py-2 font-semibold text-white hover:bg-[#355c4a]/80 disabled:opacity-60"
           disabled={loading}
         >
           {loading ? 'Submitting...' : 'Create Service'}
         </button>
       </div>
     </form>
-  );
+  )
 }

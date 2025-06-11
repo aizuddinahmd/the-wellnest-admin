@@ -1,69 +1,68 @@
-"use client";
-import React, { useState, useRef, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+'use client'
+import React, { useState, useRef, useEffect } from 'react'
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
 
-import { Search, CalendarIcon, Clock, ChevronDown } from "lucide-react";
+import { Search, CalendarIcon, Clock, ChevronDown } from 'lucide-react'
 import {
   EventInput,
   DateSelectArg,
   EventClickArg,
   EventContentArg,
-} from "@fullcalendar/core";
-import { useModal } from "@/hooks/useModal";
-import { Modal } from "@/components/ui/modal";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+} from '@fullcalendar/core'
+import { useModal } from '@/hooks/useModal'
+import { Modal } from '@/components/ui/modal'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
-    calendar: string;
-  };
+    calendar: string
+  }
 }
 
 interface Event {
-  id: string;
-  title: string;
-  start_time: string;
-  end_time: string;
-  color: string;
-  instructor: string;
-  class_pax: number;
-  waitlist: number;
-  repeat: string;
-  repeat_days: number[];
+  id: string
+  title: string
+  start_time: string
+  end_time: string
+  color: string
+  instructor: string
+  class_pax: number
+  waitlist: number
+  repeat: string
+  repeat_days: number[]
 }
 
 const Calendar: React.FC = () => {
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
-    null,
-  );
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventStartDate, setEventStartDate] = useState<Date | null>(null);
-  const [eventEndDate, setEventEndDate] = useState("");
-  const [eventLevel, setEventLevel] = useState("");
-  const [dailyTime, setDailyTime] = useState<Date | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [showDailyTimePicker, setShowDailyTimePicker] = useState(false);
-  const [colorOpen, setColorOpen] = useState(false);
-  const [repeat, setRepeat] = useState<"none" | "daily" | "weekly">("none");
-  const [weeklyDays, setWeeklyDays] = useState<number[]>([]);
-  const [instructor, setInstructor] = useState("");
-  const [classPax, setClassPax] = useState(1);
-  const [waitlist, setWaitlist] = useState(0);
-  const [publish, setPublish] = useState<"now" | "later">("now");
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const calendarRef = useRef<FullCalendar>(null);
-  const { isOpen, openModal, closeModal } = useModal();
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+  const [eventTitle, setEventTitle] = useState('')
+  const [eventStartDate, setEventStartDate] = useState<Date | null>(null)
+  const [eventEndDate, setEventEndDate] = useState('')
+  const [eventLevel, setEventLevel] = useState('')
+  const [dailyTime, setDailyTime] = useState<Date | null>(null)
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showTimePicker, setShowTimePicker] = useState(false)
+  const [showDailyTimePicker, setShowDailyTimePicker] = useState(false)
+  const [colorOpen, setColorOpen] = useState(false)
+  const [repeat, setRepeat] = useState<'none' | 'daily' | 'weekly'>('none')
+  const [weeklyDays, setWeeklyDays] = useState<number[]>([])
+  const [instructor, setInstructor] = useState('')
+  const [classPax, setClassPax] = useState(1)
+  const [waitlist, setWaitlist] = useState(0)
+  const [publish, setPublish] = useState<'now' | 'later'>('now')
+  const [events, setEvents] = useState<CalendarEvent[]>([])
+  const calendarRef = useRef<FullCalendar>(null)
+  const { isOpen, openModal, closeModal } = useModal()
   const [startTime, setStartTime] = useState<Date | null>(
     new Date(new Date().setHours(8, 0, 0, 0)),
-  );
-  const [courseOptions, setCourseOptions] = useState<string[]>([]);
+  )
+  const [courseOptions, setCourseOptions] = useState<string[]>([])
+  const [duration, setDuration] = useState(60)
 
-  const weekLabels = ["S", "M", "T", "W", "T", "F", "S"];
+  const weekLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
   // const calendarsEvents = {
   //   Danger: "danger",
@@ -75,25 +74,25 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch("/api/course", { method: "GET" });
-        const data = await res.json();
+        const res = await fetch('/api/course', { method: 'GET' })
+        const data = await res.json()
         if (Array.isArray(data)) {
-          setCourseOptions(data.map((course) => course.title));
+          setCourseOptions(data.map((course) => course.title))
         }
       } catch (err) {
-        console.error("Failed to fetch courses", err);
+        console.error('Failed to fetch courses', err)
       }
-    };
-    fetchCourses();
-  }, []);
+    }
+    fetchCourses()
+  }, [])
 
   useEffect(() => {
     const fetchEvents = async () => {
-      const response = await fetch("/api/events", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
+      const response = await fetch('/api/events', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await response.json()
 
       // Transform the data to FullCalendar's expected format
       const formattedEvents = data.map((event: Event) => ({
@@ -111,12 +110,12 @@ const Calendar: React.FC = () => {
           repeat: event.repeat,
           repeatDays: event.repeat_days,
         },
-      }));
+      }))
 
-      setEvents(formattedEvents);
-      console.log("List of events:", formattedEvents);
-    };
-    fetchEvents();
+      setEvents(formattedEvents)
+      console.log('List of events:', formattedEvents)
+    }
+    fetchEvents()
     // Initialize with some events
     // setEvents([
 
@@ -142,42 +141,42 @@ const Calendar: React.FC = () => {
     //     extendedProps: { calendar: "Primary" },
     //   },
     // ]);
-  }, []);
+  }, [])
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
-    resetModalFields();
+    resetModalFields()
     setEventStartDate(
       selectInfo.startStr ? new Date(selectInfo.startStr) : null,
-    );
-    setStartTime(selectInfo.startStr ? new Date(selectInfo.startStr) : null);
-    setEventEndDate(selectInfo.endStr || selectInfo.startStr);
-    openModal();
-  };
+    )
+    setStartTime(selectInfo.startStr ? new Date(selectInfo.startStr) : null)
+    setEventEndDate(selectInfo.endStr || selectInfo.startStr)
+    openModal()
+  }
 
   const handleEventClick = (clickInfo: EventClickArg) => {
-    setSelectedEvent(clickInfo.event as unknown as CalendarEvent);
-    setEventTitle(clickInfo.event.title);
+    setSelectedEvent(clickInfo.event as unknown as CalendarEvent)
+    setEventTitle(clickInfo.event.title)
     setEventStartDate(
       clickInfo.event.start ? new Date(clickInfo.event.start) : null,
-    );
+    )
     setEventEndDate(
       clickInfo.event.end
-        ? clickInfo.event.end.toISOString().split("T")[0]
-        : "",
-    );
-    setEventLevel(clickInfo.event.extendedProps.calendar);
-    openModal();
-  };
+        ? clickInfo.event.end.toISOString().split('T')[0]
+        : '',
+    )
+    setEventLevel(clickInfo.event.extendedProps.calendar)
+    openModal()
+  }
 
   const getCombinedDateTime = () => {
-    if (!eventStartDate || !startTime) return null;
-    const combined = new Date(eventStartDate);
-    combined.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
-    return combined;
-  };
+    if (!eventStartDate || !startTime) return null
+    const combined = new Date(eventStartDate)
+    combined.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0)
+    return combined
+  }
 
   const handleAddOrUpdateEvent = async () => {
-    const eventStart = getCombinedDateTime();
+    const eventStart = getCombinedDateTime()
     const eventData = {
       title: eventTitle,
       start_time: eventStart ? eventStart.toISOString() : null,
@@ -188,17 +187,18 @@ const Calendar: React.FC = () => {
       color: eventLevel, // or your color state
       repeat,
       repeat_days: weeklyDays,
-    };
+      duration,
+    }
 
     // Save to database
     try {
-      const response = await fetch("/api/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventData),
-      });
-      if (!response.ok) throw new Error("Failed to save event");
-      const savedEvent = await response.json();
+      })
+      if (!response.ok) throw new Error('Failed to save event')
+      const savedEvent = await response.json()
 
       // Optionally, add the saved event to your local state
       setEvents((prev) => [
@@ -210,30 +210,30 @@ const Calendar: React.FC = () => {
           allDay: false,
           extendedProps: { calendar: savedEvent.color },
         },
-      ]);
+      ])
     } catch (err) {
       // Handle error (show toast, etc)
-      console.error(err);
+      console.error(err)
     }
 
-    closeModal();
-    resetModalFields();
-  };
+    closeModal()
+    resetModalFields()
+  }
 
   const resetModalFields = () => {
-    setEventTitle("");
-    setEventStartDate(null);
-    setEventEndDate("");
-    setEventLevel("");
-    setColorOpen(false);
-    setSelectedEvent(null);
-  };
+    setEventTitle('')
+    setEventStartDate(null)
+    setEventEndDate('')
+    setEventLevel('')
+    setColorOpen(false)
+    setSelectedEvent(null)
+  }
 
   const handleToggleDay = (day: number) => {
     setWeeklyDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
-  };
+    )
+  }
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -244,9 +244,9 @@ const Calendar: React.FC = () => {
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
           headerToolbar={{
-            left: "prev,next addEventButton",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
+            left: 'prev,next addEventButton',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay',
           }}
           slotMinTime="07:00:00"
           slotMaxTime="23:00:00"
@@ -258,14 +258,14 @@ const Calendar: React.FC = () => {
           eventContent={renderEventContent}
           customButtons={{
             addEventButton: {
-              text: "Add Event +",
+              text: 'Add Event +',
               click: openModal,
             },
           }}
           businessHours={{
             daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
-            startTime: "08:00",
-            endTime: "20:00",
+            startTime: '08:00',
+            endTime: '20:00',
           }}
         />
       </div>
@@ -287,7 +287,9 @@ const Calendar: React.FC = () => {
               >
                 <option value="">Select a class</option>
                 {courseOptions.map((name) => (
-                  <option key={name} value={name}>{name}</option>
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
                 ))}
               </select>
               <Search className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -310,8 +312,8 @@ const Calendar: React.FC = () => {
                 placeholder="09/04/2024"
                 value={
                   eventStartDate
-                    ? eventStartDate.toLocaleDateString("en-GB")
-                    : ""
+                    ? eventStartDate.toLocaleDateString('en-GB')
+                    : ''
                 }
                 readOnly
                 onClick={() => setShowDatePicker((v) => !v)}
@@ -341,11 +343,11 @@ const Calendar: React.FC = () => {
                   value={
                     startTime
                       ? startTime.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
+                          hour: '2-digit',
+                          minute: '2-digit',
                           hour12: true,
                         })
-                      : ""
+                      : ''
                   }
                   readOnly
                   onClick={() => setShowTimePicker((v) => !v)}
@@ -356,8 +358,8 @@ const Calendar: React.FC = () => {
                     <DatePicker
                       selected={startTime}
                       onChange={(date) => {
-                        setStartTime(date);
-                        setShowTimePicker(false);
+                        setStartTime(date)
+                        setShowTimePicker(false)
                       }}
                       showTimeSelect
                       showTimeSelectOnly
@@ -376,8 +378,8 @@ const Calendar: React.FC = () => {
                 <input
                   type="text"
                   className="w-full rounded-lg border bg-gray-100 px-4 py-2 text-base"
-                  value="60"
-                  disabled
+                  value={duration}
+                  onChange={(e) => setDuration(Number(e.target.value))}
                 />
                 <span className="ml-2 text-gray-400">minutes</span>
               </div>
@@ -411,8 +413,8 @@ const Calendar: React.FC = () => {
                 <input
                   type="radio"
                   name="repeat"
-                  checked={repeat === "none"}
-                  onChange={() => setRepeat("none")}
+                  checked={repeat === 'none'}
+                  onChange={() => setRepeat('none')}
                 />
                 Doesn&apos;t repeat
               </label>
@@ -420,8 +422,8 @@ const Calendar: React.FC = () => {
                 <input
                   type="radio"
                   name="repeat"
-                  checked={repeat === "daily"}
-                  onChange={() => setRepeat("daily")}
+                  checked={repeat === 'daily'}
+                  onChange={() => setRepeat('daily')}
                 />
                 Daily
               </label>
@@ -429,13 +431,13 @@ const Calendar: React.FC = () => {
                 <input
                   type="radio"
                   name="repeat"
-                  checked={repeat === "weekly"}
-                  onChange={() => setRepeat("weekly")}
+                  checked={repeat === 'weekly'}
+                  onChange={() => setRepeat('weekly')}
                 />
                 Weekly
               </label>
               {/* Daily time picker */}
-              {repeat === "daily" && (
+              {repeat === 'daily' && (
                 <div className="mt-4">
                   <label className="mb-1 block font-medium">Time</label>
                   <div className="relative w-40">
@@ -445,11 +447,11 @@ const Calendar: React.FC = () => {
                       value={
                         dailyTime
                           ? dailyTime.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
+                              hour: '2-digit',
+                              minute: '2-digit',
                               hour12: true,
                             })
-                          : ""
+                          : ''
                       }
                       readOnly
                       onClick={() => setShowDailyTimePicker((v) => !v)}
@@ -459,8 +461,8 @@ const Calendar: React.FC = () => {
                         <DatePicker
                           selected={dailyTime}
                           onChange={(date) => {
-                            setDailyTime(date);
-                            setShowDailyTimePicker(false);
+                            setDailyTime(date)
+                            setShowDailyTimePicker(false)
                           }}
                           showTimeSelect
                           showTimeSelectOnly
@@ -475,7 +477,7 @@ const Calendar: React.FC = () => {
                 </div>
               )}
               {/* Weekly day picker */}
-              {repeat === "weekly" && (
+              {repeat === 'weekly' && (
                 <div className="mt-4 flex gap-2">
                   {weekLabels.map((label, idx) => (
                     <button
@@ -483,8 +485,8 @@ const Calendar: React.FC = () => {
                       type="button"
                       className={`flex h-12 w-12 items-center justify-center rounded-lg border text-lg font-semibold transition-colors ${
                         weeklyDays.includes(idx)
-                          ? "bg-black text-white"
-                          : "border-gray-300 bg-white text-black"
+                          ? 'bg-black text-white'
+                          : 'border-gray-300 bg-white text-black'
                       } `}
                       onClick={() => handleToggleDay(idx)}
                     >
@@ -563,8 +565,8 @@ const Calendar: React.FC = () => {
                 <input
                   type="radio"
                   name="publish"
-                  checked={publish === "now"}
-                  onChange={() => setPublish("now")}
+                  checked={publish === 'now'}
+                  onChange={() => setPublish('now')}
                 />
                 Publish now
               </label>
@@ -572,12 +574,12 @@ const Calendar: React.FC = () => {
                 <input
                   type="radio"
                   name="publish"
-                  checked={publish === "later"}
-                  onChange={() => setPublish("later")}
+                  checked={publish === 'later'}
+                  onChange={() => setPublish('later')}
                 />
                 Publish later
               </label>
-              {publish === "later" && (
+              {publish === 'later' && (
                 <input
                   type="text"
                   className="mt-2 w-48 rounded-lg border bg-gray-100 px-4 py-2 text-base text-gray-400"
@@ -601,17 +603,17 @@ const Calendar: React.FC = () => {
               type="button"
               className="btn btn-success btn-update-event bg-brand-500 hover:bg-brand-600 flex w-full justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white sm:w-auto"
             >
-              {selectedEvent ? "Update Changes" : "Add Event"}
+              {selectedEvent ? 'Update Changes' : 'Add Event'}
             </button>
           </div>
         </div>
       </Modal>
     </div>
-  );
-};
+  )
+}
 
 const renderEventContent = (eventInfo: EventContentArg) => {
-  const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`;
+  const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`
   return (
     <div
       className={`event-fc-color fc-event-main flex ${colorClass} rounded-sm p-1`}
@@ -620,7 +622,7 @@ const renderEventContent = (eventInfo: EventContentArg) => {
       <div className="fc-event-time">{eventInfo.timeText}</div>
       <div className="fc-event-title">{eventInfo.event.title}</div>
     </div>
-  );
-};
+  )
+}
 
-export default Calendar;
+export default Calendar
