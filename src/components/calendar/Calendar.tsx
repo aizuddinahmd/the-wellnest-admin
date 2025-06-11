@@ -377,10 +377,13 @@ const Calendar: React.FC = () => {
               <label className="mb-1 block font-semibold">Duration</label>
               <div className="flex items-center">
                 <input
-                  type="text"
+                  type="number"
                   className="w-full rounded-lg border bg-gray-100 px-4 py-2 text-base"
-                  value={duration}
+                  placeholder="Enter duration in minutes"
+                  value={duration || ''}
                   onChange={(e) => setDuration(Number(e.target.value))}
+                  min="1"
+                  required
                 />
                 <span className="ml-2 text-gray-400">minutes</span>
               </div>
