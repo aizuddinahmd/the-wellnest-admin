@@ -61,6 +61,8 @@ export default function CustomerManagement() {
     eventId: '',
   })
   const [eventsToday, setEventsToday] = useState<Event[]>([])
+  const [message, setMessage] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!showModal) return
@@ -87,12 +89,37 @@ export default function CustomerManagement() {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setShowModal(false)
-    // For now, just log the data
-    console.log('Register customer:', form)
-    setForm({ name: '', phone: '', email: '', eventId: '' })
+    setLoading(true)
+    setMessage(null)
+    try {
+      const res = await fetch('/api/register-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          eventId: form.eventId,
+        }),
+      })
+      const data = await res.json()
+      // console.log('data', data)
+      if (!res.ok) {
+        setMessage(data.error || 'Registration failed')
+        setShowModal(false)
+      } else {
+        setMessage('Registration successful!')
+        setShowModal(false)
+        setForm({ name: '', phone: '', email: '', eventId: '' })
+      }
+    } catch (err) {
+      console.error('Error:', err)
+      setMessage('An error occurred. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -106,6 +133,13 @@ export default function CustomerManagement() {
           Register
         </button>
       </div>
+      {message && (
+        <div
+          className={`mb-4 rounded p-3 text-sm ${message.includes('success') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
+        >
+          {message}
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
@@ -227,8 +261,9 @@ export default function CustomerManagement() {
                 <button
                   type="submit"
                   className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
+                  disabled={loading}
                 >
-                  Register
+                  {loading ? 'Registering...' : 'Register'}
                 </button>
               </div>
             </form>

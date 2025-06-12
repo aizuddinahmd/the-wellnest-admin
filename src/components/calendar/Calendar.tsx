@@ -124,7 +124,6 @@ const Calendar: React.FC = () => {
       }))
 
       setEvents(formattedEvents)
-      console.log('List of events:', formattedEvents)
     }
     fetchEvents()
   }, [])

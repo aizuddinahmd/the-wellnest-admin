@@ -48,7 +48,7 @@ export async function GET() {
       .select('*')
       .order('start_time', { ascending: true })
 
-    console.log('Fetched events:', data)
+    // console.log('Fetched events:', data)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
