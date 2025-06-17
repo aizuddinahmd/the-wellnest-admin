@@ -107,3 +107,14 @@ export async function POST(request: Request) {
     )
   }
 }
+
+export async function GET() {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, full_name, email, phone')
+    .order('full_name', { ascending: true })
+    .limit(100) // adjust as needed
+  if (error) return NextResponse.json([], { status: 500 })
+  return NextResponse.json(data)
+}

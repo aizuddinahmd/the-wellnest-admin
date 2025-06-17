@@ -54,15 +54,18 @@ function isToday(dateStr: string) {
 
 export default function CustomerManagement() {
   const [showModal, setShowModal] = useState(false)
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [form, setForm] = useState({
     name: '',
     phone: '',
     email: '',
     eventId: '',
+    search: '',
   })
   const [eventsToday, setEventsToday] = useState<Event[]>([])
   const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [customers, setCustomers] = useState<any[]>([])
 
   useEffect(() => {
     if (!showModal) return
@@ -82,6 +85,16 @@ export default function CustomerManagement() {
     fetchEvents()
   }, [showModal])
 
+  useEffect(() => {
+    // Fetch customers when component mounts
+    const fetchCustomers = async () => {
+      const res = await fetch('/api/customers')
+      const data = await res.json()
+      setCustomers(data)
+    }
+    fetchCustomers()
+  }, [])
+
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -94,7 +107,7 @@ export default function CustomerManagement() {
     setLoading(true)
     setMessage(null)
     try {
-      const res = await fetch('/api/register-customer', {
+      const res = await fetch('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +125,7 @@ export default function CustomerManagement() {
       } else {
         setMessage('Registration successful!')
         setShowModal(false)
-        setForm({ name: '', phone: '', email: '', eventId: '' })
+        setForm({ name: '', phone: '', email: '', eventId: '', search: '' })
       }
     } catch (err) {
       console.error('Error:', err)
@@ -123,7 +136,7 @@ export default function CustomerManagement() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="mb-4 flex items-center justify-between">
         <div className="text-xl font-bold">Customer Management</div>
         <button
@@ -162,10 +175,10 @@ export default function CustomerManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {mockCustomers.map((c) => (
+            {customers.map((c) => (
               <tr key={c.id}>
                 <td className="px-4 py-4 font-medium text-gray-900">
-                  {c.name}
+                  {c.full_name}
                 </td>
                 <td className="px-4 py-4 text-gray-700">{c.phone}</td>
                 <td className="px-4 py-4 text-gray-700">{c.email}</td>
@@ -173,24 +186,77 @@ export default function CustomerManagement() {
                   <span
                     className={`inline-block rounded px-3 py-1 text-xs font-semibold ${c.status === 'Active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}
                   >
-                    {c.status}
+                    {c.status || 'Active'}
                   </span>
                 </td>
                 <td className="px-4 py-4 text-gray-700">
-                  {c.registrationDate}
+                  {c.created_at
+                    ? new Date(c.created_at).toLocaleDateString()
+                    : ''}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {/* Registration Modal */}
+      {/* Search Customer Modal*/}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
             <button
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
               onClick={() => setShowModal(false)}
+            >
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path
+                  d="M6 6l12 12M6 18L18 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+            <h3 className="mb-6 text-lg font-bold">Register Customer</h3>
+            <div>
+              <label className="mb-2 block font-semibold">
+                Search existing customer
+              </label>
+              <input
+                type="text"
+                className="mb-2 w-full rounded-lg border px-4 py-2"
+                placeholder="Enter customer name, email or phone number"
+                value={form.search || ''}
+                onChange={(e) => {
+                  setForm((prev) => ({ ...prev, search: e.target.value }))
+                }}
+              />
+
+              <div className="my-4 flex items-center">
+                <hr className="flex-grow border-t" />
+                <span className="mx-2 text-gray-400">OR</span>
+                <hr className="flex-grow border-t" />
+              </div>
+              <button
+                className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 font-semibold hover:bg-gray-50"
+                onClick={() => {
+                  setShowModal(false)
+                  setShowRegistrationModal(true)
+                }}
+              >
+                <span>➕</span> Add new customer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Modal */}
+      {showRegistrationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowRegistrationModal(false)}
             >
               <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
                 <path

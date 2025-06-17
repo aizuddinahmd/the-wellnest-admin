@@ -52,7 +52,7 @@ export default function EventsToday() {
   }, [])
 
   return (
-    <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow">
+    <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="mb-4 text-xl font-bold">Events Scheduled for Today</div>
       <div className="overflow-x-auto">
         {loading ? (
