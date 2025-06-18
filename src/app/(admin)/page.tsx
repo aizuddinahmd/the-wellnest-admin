@@ -1,5 +1,5 @@
 'use client'
-import CustomerManagement from '@/components/admin/CustomerManagement'
+import BookingsManagement from '@/components/admin/BookingsManagement'
 import EventsToday from '@/components/admin/EventsToday'
 import { EcommerceMetrics } from '@/components/ecommerce/EcommerceMetrics'
 
@@ -13,7 +13,7 @@ export default function AdminPage() {
         <EventsToday />
       </div>
       <div className="col-span-12">
-        <CustomerManagement />
+        <BookingsManagement />
       </div>
     </div>
   )
