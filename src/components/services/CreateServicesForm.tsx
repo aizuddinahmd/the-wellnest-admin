@@ -6,6 +6,7 @@ import Input from '../form/input/InputField'
 import Label from '../form/Label'
 import Select from '../form/Select'
 import { useDropzone } from 'react-dropzone'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 
 export default function CreateServicesForm() {
   const options = [
@@ -24,6 +25,10 @@ export default function CreateServicesForm() {
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [type, setType] = useState('')
+  const [label, setLabel] = useState('')
+  const [sessions, setSessions] = useState('')
+  const [durationDays, setDurationDays] = useState('')
 
   const handleSelectChange = (value: string) => {
     setCategory(value)
@@ -205,6 +210,165 @@ export default function CreateServicesForm() {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <div className="max-w-full overflow-x-auto">
+              <div className="min-w-[1102px]">
+                <Table>
+                  {/* Table Header */}
+                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                    <TableRow>
+                      <TableCell
+                        isHeader
+                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                      >
+                        Type
+                      </TableCell>
+
+                      <TableCell
+                        isHeader
+                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                      >
+                        Sessions
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                      >
+                        Price (RM)
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                      >
+                        Duration Days
+                      </TableCell>
+                    </TableRow>
+                  </TableHeader>
+
+                  {/* Table Body */}
+                  <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    <TableRow>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
+                            Single
+                          </div>
+                          <div className="text-theme-xs text-gray-500 dark:text-gray-400">
+                            1 Session
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Sessions"
+                          value={sessions}
+                          onChange={(e) => setSessions(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Price"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Duration Days"
+                          value={durationDays}
+                          onChange={(e) => setDurationDays(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
+                            Packages
+                          </div>
+                          <div className="text-theme-xs text-gray-500 dark:text-gray-400">
+                            10 Sessions Package
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Sessions"
+                          value={sessions}
+                          onChange={(e) => setSessions(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Price"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Duration Days"
+                          value={durationDays}
+                          onChange={(e) => setDurationDays(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
+                            Membership
+                          </div>
+                          <div className="text-theme-xs text-gray-500 dark:text-gray-400">
+                            Monthly Membership
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Sessions"
+                          value={sessions}
+                          onChange={(e) => setSessions(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Price"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <input
+                          type="number"
+                          placeholder="Duration Days"
+                          value={durationDays}
+                          onChange={(e) => setDurationDays(e.target.value)}
+                          className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </div>
         </ComponentCard>
