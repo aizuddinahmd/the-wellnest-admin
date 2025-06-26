@@ -20,15 +20,24 @@ export default function CreateServicesForm() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState(options[0].value)
-  const [price, setPrice] = useState('')
   const [duration, setDuration] = useState(0)
   const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
-  const [type, setType] = useState('')
-  const [label, setLabel] = useState('')
-  const [sessions, setSessions] = useState('')
-  const [durationDays, setDurationDays] = useState('')
+  const [singlePrice, setSinglePrice] = useState('')
+
+  // Separate price states for each type
+
+  const [packageType, setPackageType] = useState({
+    sessions: '',
+    price: '',
+    durationDays: '',
+  })
+  const [membership, setMembership] = useState({
+    sessions: '',
+    price: '',
+    durationDays: '',
+  })
 
   const handleSelectChange = (value: string) => {
     setCategory(value)
@@ -63,8 +72,14 @@ export default function CreateServicesForm() {
           description,
           category,
           duration_minutes: duration,
-          base_price: price ? parseFloat(price) : 0,
           image_url: imageUrl,
+          base_price: singlePrice,
+          package_price: packageType.price,
+          membership_price: membership.price,
+          package_sessions: packageType.sessions,
+          membership_sessions: membership.sessions,
+          package_duration_days: packageType.durationDays,
+          membership_duration_days: membership.durationDays,
         }),
       })
       if (!res.ok) {
@@ -75,9 +90,10 @@ export default function CreateServicesForm() {
         setName('')
         setDescription('')
         setCategory(options[0].value)
-        setPrice('')
         setDuration(0)
         setImageUrl('')
+        setPackageType({ sessions: '', price: '', durationDays: '' })
+        setMembership({ sessions: '', price: '', durationDays: '' })
       }
     } catch (err) {
       console.error('Error creating service:', err)
@@ -201,17 +217,6 @@ export default function CreateServicesForm() {
       </div>
       <div className="space-y-6">
         <ComponentCard title="Price">
-          <div className="space-y-6">
-            <div>
-              <Label>Price (RM)</Label>
-              <Input
-                type="number"
-                placeholder="Enter price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-          </div>
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
             <div className="max-w-full overflow-x-auto">
               <div className="min-w-[1102px]">
@@ -251,7 +256,7 @@ export default function CreateServicesForm() {
                   <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                     <TableRow>
                       <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-start gap-2">
                           <div className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
                             Single
                           </div>
@@ -264,8 +269,8 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Sessions"
-                          value={sessions}
-                          onChange={(e) => setSessions(e.target.value)}
+                          value={1}
+                          disabled
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
@@ -273,24 +278,23 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Price"
-                          value={price}
-                          onChange={(e) => setPrice(e.target.value)}
+                          value={singlePrice}
+                          onChange={(e) => setSinglePrice(e.target.value)}
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
                       <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                         <input
                           type="number"
-                          placeholder="Duration Days"
-                          value={durationDays}
-                          onChange={(e) => setDurationDays(e.target.value)}
+                          placeholder="-"
+                          disabled
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-start gap-2">
                           <div className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
                             Packages
                           </div>
@@ -303,8 +307,13 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Sessions"
-                          value={sessions}
-                          onChange={(e) => setSessions(e.target.value)}
+                          value={packageType.sessions}
+                          onChange={(e) =>
+                            setPackageType((prev) => ({
+                              ...prev,
+                              sessions: e.target.value,
+                            }))
+                          }
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
@@ -312,8 +321,13 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Price"
-                          value={price}
-                          onChange={(e) => setPrice(e.target.value)}
+                          value={packageType.price}
+                          onChange={(e) =>
+                            setPackageType((prev) => ({
+                              ...prev,
+                              price: e.target.value,
+                            }))
+                          }
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
@@ -321,15 +335,20 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Duration Days"
-                          value={durationDays}
-                          onChange={(e) => setDurationDays(e.target.value)}
+                          value={packageType.durationDays}
+                          onChange={(e) =>
+                            setPackageType((prev) => ({
+                              ...prev,
+                              durationDays: e.target.value,
+                            }))
+                          }
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-start gap-2">
                           <div className="text-theme-sm font-medium text-gray-800 dark:text-white/90">
                             Membership
                           </div>
@@ -342,8 +361,13 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Sessions"
-                          value={sessions}
-                          onChange={(e) => setSessions(e.target.value)}
+                          value={membership.sessions}
+                          onChange={(e) =>
+                            setMembership((prev) => ({
+                              ...prev,
+                              sessions: e.target.value,
+                            }))
+                          }
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
@@ -351,8 +375,13 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Price"
-                          value={price}
-                          onChange={(e) => setPrice(e.target.value)}
+                          value={membership.price}
+                          onChange={(e) =>
+                            setMembership((prev) => ({
+                              ...prev,
+                              price: e.target.value,
+                            }))
+                          }
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
@@ -360,8 +389,13 @@ export default function CreateServicesForm() {
                         <input
                           type="number"
                           placeholder="Duration Days"
-                          value={durationDays}
-                          onChange={(e) => setDurationDays(e.target.value)}
+                          value={membership.durationDays}
+                          onChange={(e) =>
+                            setMembership((prev) => ({
+                              ...prev,
+                              durationDays: e.target.value,
+                            }))
+                          }
                           className="rounded-md border border-gray-200 p-2 dark:border-white/[0.05]"
                         />
                       </TableCell>
