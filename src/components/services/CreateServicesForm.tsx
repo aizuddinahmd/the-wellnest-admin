@@ -7,6 +7,7 @@ import Label from '../form/Label'
 import Select from '../form/Select'
 import { useDropzone } from 'react-dropzone'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
+import Button from '../ui/button/Button'
 
 export default function CreateServicesForm() {
   const options = [
@@ -415,13 +416,9 @@ export default function CreateServicesForm() {
         </div>
       )}
       <div className="mt-8 flex justify-end">
-        <button
-          type="submit"
-          className="rounded bg-[#355c4a] px-6 py-2 font-semibold text-white hover:bg-[#355c4a]/80 disabled:opacity-60"
-          disabled={loading}
-        >
-          {loading ? 'Submitting...' : 'Create Service'}
-        </button>
+        <Button disabled={loading}>
+          {loading ? 'Submitting...' : 'Submit'}
+        </Button>
       </div>
     </form>
   )
