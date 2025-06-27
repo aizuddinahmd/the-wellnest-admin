@@ -14,13 +14,6 @@ import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 
-// const Categories = [
-// 	{ name: 'Massage', items: 1 },
-// 	{ name: 'Mat Pilates', items: 3 },
-// 	{ name: 'Yoga', items: 2 },
-// 	{ name: 'Reformer Pilates', items: 2 },
-// ]
-
 interface Service {
   id: string
   name: string
@@ -100,14 +93,16 @@ export const ServicesCard = () => {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              startIcon={<FilterIcon className="h-4 w-4" />}
+              startIcon={<FilterIcon className="h-3 w-3" />}
               onClick={() => openModal()}
+              size="sm"
             >
               Filter
             </Button>
             <Button
-              endIcon={<PlusIcon className="h-4 w-4" />}
+              endIcon={<PlusIcon className="h-3 w-3" />}
               onClick={() => openModal()}
+              size="sm"
             >
               Add Service
             </Button>
