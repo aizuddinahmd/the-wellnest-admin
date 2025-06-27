@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useModal } from '@/hooks/useModal'
+import { Modal } from '../ui/modal'
 
 interface Customer {
   id: string
@@ -26,7 +28,8 @@ function isToday(dateStr: string) {
 }
 
 export default function CustomerManagement() {
-  const [showModal, setShowModal] = useState(false)
+  // const [showModal, setShowModal] = useState(false)
+  const { isOpen, openModal, closeModal } = useModal()
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [form, setForm] = useState({
     name: '',
@@ -40,23 +43,23 @@ export default function CustomerManagement() {
   const [loading, setLoading] = useState(false)
   const [customers, setCustomers] = useState<any[]>([])
 
-  useEffect(() => {
-    if (!showModal) return
-    const fetchEvents = async () => {
-      try {
-        const res = await fetch('/api/events')
-        const data = await res.json()
-        if (Array.isArray(data)) {
-          setEventsToday(data.filter((e: Event) => isToday(e.start_time)))
-        } else {
-          setEventsToday([])
-        }
-      } catch {
-        setEventsToday([])
-      }
-    }
-    fetchEvents()
-  }, [showModal])
+  // useEffect(() => {
+  //   if (!showModal) return
+  //   const fetchEvents = async () => {
+  //     try {
+  //       const res = await fetch('/api/events')
+  //       const data = await res.json()
+  //       if (Array.isArray(data)) {
+  //         setEventsToday(data.filter((e: Event) => isToday(e.start_time)))
+  //       } else {
+  //         setEventsToday([])
+  //       }
+  //     } catch {
+  //       setEventsToday([])
+  //     }
+  //   }
+  //   fetchEvents()
+  // }, [showModal])
 
   useEffect(() => {
     // Fetch customers when component mounts
@@ -94,10 +97,10 @@ export default function CustomerManagement() {
       // console.log('data', data)
       if (!res.ok) {
         setMessage(data.error || 'Registration failed')
-        setShowModal(false)
+        closeModal()
       } else {
         setMessage('Registration successful!')
-        setShowModal(false)
+        closeModal()
         setForm({ name: '', phone: '', email: '', eventId: '', search: '' })
       }
     } catch (err) {
@@ -113,10 +116,10 @@ export default function CustomerManagement() {
       <div className="mb-4 flex items-center justify-between">
         <div className="text-xl font-bold">Customer Management</div>
         <button
-          className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
-          onClick={() => setShowModal(true)}
+          onClick={openModal}
+          className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
         >
-          Register
+          Add Customer
         </button>
       </div>
       {message && (
@@ -173,55 +176,80 @@ export default function CustomerManagement() {
         </table>
       </div>
       {/* Search Customer Modal*/}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-              onClick={() => setShowModal(false)}
-            >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M6 6l12 12M6 18L18 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-            <h3 className="mb-6 text-lg font-bold">Register Customer</h3>
-            <div>
-              <label className="mb-2 block font-semibold">
-                Search existing customer
-              </label>
-              <input
-                type="text"
-                className="mb-2 w-full rounded-lg border px-4 py-2"
-                placeholder="Enter customer name, email or phone number"
-                value={form.search || ''}
-                onChange={(e) => {
-                  setForm((prev) => ({ ...prev, search: e.target.value }))
-                }}
-              />
 
-              <div className="my-4 flex items-center">
-                <hr className="flex-grow border-t" />
-                <span className="mx-2 text-gray-400">OR</span>
-                <hr className="flex-grow border-t" />
-              </div>
-              <button
-                className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 font-semibold hover:bg-gray-50"
-                onClick={() => {
-                  setShowModal(false)
-                  setShowRegistrationModal(true)
-                }}
-              >
-                <span>➕</span> Add new customer
-              </button>
+      <Modal
+        isOpen={isOpen}
+        onClose={closeModal}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
+          <h3 className="mb-6 text-2xl font-bold">Register Customer</h3>
+          <div>
+            <label className="mb-2 block font-semibold">
+              Search existing customer
+            </label>
+            <input
+              type="text"
+              className="mb-2 w-full rounded-lg border px-4 py-2"
+              placeholder="Enter customer name, email or phone number"
+              value={form.search || ''}
+              onChange={(e) => {
+                setForm((prev) => ({ ...prev, search: e.target.value }))
+              }}
+            />
+
+            <div className="my-4 flex items-center">
+              <hr className="flex-grow border-t" />
+              <span className="mx-2 text-gray-400">OR</span>
+              <hr className="flex-grow border-t" />
             </div>
+            <button
+              className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 font-semibold hover:bg-gray-50"
+              onClick={() => {
+                closeModal()
+                setShowRegistrationModal(true)
+              }}
+            >
+              <span>➕</span> Add new customer
+            </button>
           </div>
+
+          {/* <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+            <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+              <h3 className="mb-6 text-lg font-bold">Register Customer</h3>
+              <div>
+                <label className="mb-2 block font-semibold">
+                  Search existing customer
+                </label>
+                <input
+                  type="text"
+                  className="mb-2 w-full rounded-lg border px-4 py-2"
+                  placeholder="Enter customer name, email or phone number"
+                  value={form.search || ''}
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, search: e.target.value }))
+                  }}
+                />
+
+                <div className="my-4 flex items-center">
+                  <hr className="flex-grow border-t" />
+                  <span className="mx-2 text-gray-400">OR</span>
+                  <hr className="flex-grow border-t" />
+                </div>
+                <button
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 font-semibold hover:bg-gray-50"
+                  onClick={() => {
+                    closeModal()
+                    setShowRegistrationModal(true)
+                  }}
+                >
+                  <span>➕</span> Add new customer
+                </button>
+              </div>
+            </div>
+          </div> */}
         </div>
-      )}
+      </Modal>
 
       {/* Registration Modal */}
       {showRegistrationModal && (

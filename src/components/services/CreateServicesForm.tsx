@@ -105,6 +105,7 @@ export default function CreateServicesForm() {
 
   return (
     <form onSubmit={handleSubmit}>
+      <h1 className="mb-6 text-2xl font-bold">Create New Service</h1>
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-6">
           <ComponentCard title="Service Details">

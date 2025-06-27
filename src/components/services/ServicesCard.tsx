@@ -1,8 +1,9 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-// import FullScreenModal from '../example/ModalExample/FullScreenModal';
-// import FormInModal from '../example/ModalExample/FormInModal';
+import { useModal } from '@/hooks/useModal'
+import { Modal } from '../ui/modal'
 import { useRouter } from 'next/navigation'
+import CreateServicesForm from './CreateServicesForm'
 
 // const Categories = [
 // 	{ name: 'Massage', items: 1 },
@@ -23,6 +24,7 @@ export const ServicesCard = () => {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { isOpen, openModal, closeModal } = useModal()
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -59,7 +61,7 @@ export const ServicesCard = () => {
           Services
         </h3>
         <button
-          onClick={() => router.push('/services/create-services')}
+          onClick={openModal}
           className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
         >
           Add Service
@@ -114,6 +116,15 @@ export const ServicesCard = () => {
           </div>
         )}
       </div>
+      <Modal
+        isOpen={isOpen}
+        onClose={closeModal}
+        className="max-w-full p-6 lg:p-10"
+      >
+        <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
+          <CreateServicesForm />
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -50,26 +50,3 @@ export async function POST(request: Request) {
     )
   }
 }
-
-// GET: Fetch all packages
-export async function GET() {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('Error fetching services:', error)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 },
-    )
-  }
-}
