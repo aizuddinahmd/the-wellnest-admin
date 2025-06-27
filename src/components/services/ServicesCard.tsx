@@ -1,9 +1,11 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { useModal } from '@/hooks/useModal'
-import { Modal } from '../ui/modal'
+// import FullScreenModal from '../example/ModalExample/FullScreenModal';
+// import FormInModal from '../example/ModalExample/FormInModal';
 import { useRouter } from 'next/navigation'
-import CreateServicesForm from './CreateServicesForm'
+import Button from '../ui/button/Button'
+import ComponentCard from '../common/ComponentCard'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 
 // const Categories = [
 // 	{ name: 'Massage', items: 1 },
@@ -15,8 +17,10 @@ import CreateServicesForm from './CreateServicesForm'
 interface Service {
   id: string
   name: string
+  description: string
   base_price: number
   category: string
+  duration_minutes: number
 }
 
 export const ServicesCard = () => {
@@ -24,7 +28,6 @@ export const ServicesCard = () => {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { isOpen, openModal, closeModal } = useModal()
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -55,76 +58,93 @@ export const ServicesCard = () => {
   // }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 sm:px-6 sm:pt-6 dark:border-gray-800 dark:bg-white/[0.03]">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Services
-        </h3>
-        <button
-          onClick={openModal}
-          className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
-        >
-          Add Service
-        </button>
-      </div>
-      {/* Courses Table */}
-      <div className="mt-8">
-        <h4 className="mb-4 text-base font-semibold text-gray-700 dark:text-white/80">
-          Available Services
-        </h4>
-        {loading ? (
-          <div className="py-8 text-center text-gray-500">Loading...</div>
-        ) : error ? (
-          <div className="py-8 text-center text-red-500">{error}</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">
-                    Name
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">
-                    Price
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">
+    <ComponentCard
+      title="Services"
+      desc="Manage your services"
+      addButton
+      ButtonText="Add Service +"
+      ButtonLink="/services/create-services"
+    >
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+        {/* <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+            Services
+          </h3>
+          <Button onClick={() => router.push('/services/create-services')}>
+            Add Service +
+          </Button>
+        </div> */}
+        {/* Courses Table */}
+        <div className="max-w-full overflow-x-auto">
+          <div className="min-w-[1102px]">
+            <Table>
+              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                <TableRow>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Services
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
                     Category
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Base Price
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Duration
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                  >
+                    Status
+                  </TableCell>
+                </TableRow>
+              </TableHeader>
+              {/* Table Body */}
+              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {services.map((service) => (
-                  <tr key={service.id}>
-                    <td className="px-4 py-2 text-gray-800 dark:text-white/90">
-                      {service.name}
-                    </td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-white/80">
-                      RM {service.base_price}
-                    </td>
-                    <td className="px-4 py-2 text-gray-700 dark:text-white/80">
+                  <TableRow key={service.id}>
+                    <TableCell className="x-5 py-4 text-start sm:px-6">
+                      <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
+                        {service.name}
+                      </span>
+                      <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
+                        {service.description}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                       {service.category}
-                    </td>
-                  </tr>
+                    </TableCell>
+                    <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                      RM {service.base_price}
+                    </TableCell>
+                    <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                      {service.duration_minutes} minutes
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
             {services.length === 0 && (
               <div className="py-8 text-center text-gray-500">
                 No services found.
               </div>
             )}
           </div>
-        )}
-      </div>
-      <Modal
-        isOpen={isOpen}
-        onClose={closeModal}
-        className="max-w-full p-6 lg:p-10"
-      >
-        <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
-          <CreateServicesForm />
         </div>
-      </Modal>
-    </div>
+      </div>
+    </ComponentCard>
   )
 }

@@ -1,9 +1,8 @@
 'use client'
-
 import React, { useState, useEffect } from 'react'
+// import FullScreenModal from '../example/ModalExample/FullScreenModal';
+// import FormInModal from '../example/ModalExample/FormInModal';
 import { useRouter } from 'next/navigation'
-import { Modal } from '../ui/modal'
-import { useModal } from '@/hooks/useModal'
 
 // const Categories = [
 // 	{ name: 'Massage', items: 1 },
@@ -19,12 +18,11 @@ interface Service {
   category: string
 }
 
-export const PricingCard = () => {
-  // const router = useRouter()
+export const ServicesCard = () => {
+  const router = useRouter()
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { isOpen, openModal, closeModal } = useModal()
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -61,7 +59,7 @@ export const PricingCard = () => {
           Services
         </h3>
         <button
-          onClick={openModal}
+          onClick={() => router.push('/services/create-services')}
           className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
         >
           Add Service
@@ -116,15 +114,6 @@ export const PricingCard = () => {
           </div>
         )}
       </div>
-      <Modal
-        isOpen={isOpen}
-        onClose={closeModal}
-        className="max-w-[700px] p-6 lg:p-10"
-      >
-        <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
-          <h2 className="mb-8 text-2xl font-bold">Add schedule</h2>
-        </div>
-      </Modal>
     </div>
   )
 }

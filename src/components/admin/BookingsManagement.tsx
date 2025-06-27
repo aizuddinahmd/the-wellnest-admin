@@ -204,139 +204,93 @@ export default function CustomerManagement() {
               <hr className="flex-grow border-t" />
             </div>
             <button
-              className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 font-semibold hover:bg-gray-50"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
               onClick={() => {
                 closeModal()
                 setShowRegistrationModal(true)
               }}
             >
-              <span>➕</span> Add new customer
+              Add new customer
             </button>
           </div>
-
-          {/* <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-            <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-              <h3 className="mb-6 text-lg font-bold">Register Customer</h3>
-              <div>
-                <label className="mb-2 block font-semibold">
-                  Search existing customer
-                </label>
-                <input
-                  type="text"
-                  className="mb-2 w-full rounded-lg border px-4 py-2"
-                  placeholder="Enter customer name, email or phone number"
-                  value={form.search || ''}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, search: e.target.value }))
-                  }}
-                />
-
-                <div className="my-4 flex items-center">
-                  <hr className="flex-grow border-t" />
-                  <span className="mx-2 text-gray-400">OR</span>
-                  <hr className="flex-grow border-t" />
-                </div>
-                <button
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2 font-semibold hover:bg-gray-50"
-                  onClick={() => {
-                    closeModal()
-                    setShowRegistrationModal(true)
-                  }}
-                >
-                  <span>➕</span> Add new customer
-                </button>
-              </div>
-            </div>
-          </div> */}
         </div>
       </Modal>
 
       {/* Registration Modal */}
-      {showRegistrationModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="relative w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
-            <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-              onClick={() => setShowRegistrationModal(false)}
-            >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M6 6l12 12M6 18L18 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-            <h3 className="mb-6 text-lg font-bold">Register New Customer</h3>
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleFormChange}
-                  className="w-full rounded border px-3 py-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleFormChange}
-                  className="w-full rounded border px-3 py-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleFormChange}
-                  className="w-full rounded border px-3 py-2"
-                  required
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">
-                  Event for Today
-                </label>
-                <select
-                  name="eventId"
-                  value={form.eventId}
-                  onChange={handleFormChange}
-                  className="w-full rounded border px-3 py-2"
-                  required
-                >
-                  <option value="">Select an event</option>
-                  {eventsToday.map((event) => (
-                    <option key={event.id} value={event.id}>
-                      {event.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="submit"
-                  className="rounded bg-black px-6 py-2 font-semibold text-white hover:bg-gray-800"
-                  disabled={loading}
-                >
-                  {loading ? 'Registering...' : 'Register'}
-                </button>
-              </div>
-            </form>
-          </div>
+      <Modal
+        isOpen={showRegistrationModal}
+        onClose={() => setShowRegistrationModal(false)}
+        className="max-w-[700px] p-6 lg:p-10"
+      >
+        <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
+          <h3 className="mb-6 text-2xl font-bold">Register New Customer</h3>
+          <form onSubmit={handleFormSubmit} className="space-y-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleFormChange}
+                className="w-full rounded border px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleFormChange}
+                className="w-full rounded border px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleFormChange}
+                className="w-full rounded border px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Event for Today
+              </label>
+              <select
+                name="eventId"
+                value={form.eventId}
+                onChange={handleFormChange}
+                className="w-full rounded border px-3 py-2"
+                required
+              >
+                <option value="">Select an event</option>
+                {eventsToday.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                type="submit"
+                className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
+                disabled={loading}
+              >
+                {loading ? 'Registering...' : 'Register'}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
+      </Modal>
     </div>
   )
 }
