@@ -1,5 +1,5 @@
 import PageBreadcrumb from '@/components/common/PageBreadCrumb'
-import { PricingCard } from '@/components/pricing/PricingCard'
+import PricingCard from '@/components/pricing/PricingCard'
 import { Metadata } from 'next'
 import React from 'react'
 

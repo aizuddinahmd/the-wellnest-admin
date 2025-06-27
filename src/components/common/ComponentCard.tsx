@@ -1,14 +1,10 @@
 import React from 'react'
-import Button from '../ui/button/Button'
 
 interface ComponentCardProps {
   title: string
   children: React.ReactNode
   className?: string // Additional custom classes for styling
   desc?: string // Description text
-  addButton?: boolean // Add button
-  ButtonText?: string // Button text
-  ButtonLink?: string // Button link
 }
 
 const ComponentCard: React.FC<ComponentCardProps> = ({
@@ -16,9 +12,6 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
   children,
   className = '',
   desc = '',
-  addButton = false,
-  ButtonText,
-  ButtonLink,
 }) => {
   return (
     <div
@@ -36,7 +29,6 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             </p>
           )}
         </div>
-        {addButton && <Button onClick={() => ButtonLink}>{ButtonText}</Button>}
       </div>
 
       {/* Card Body */}
