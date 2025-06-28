@@ -31,6 +31,10 @@ export const ServicesCard = () => {
   const [error, setError] = useState<string | null>(null)
   const { isOpen, openModal, closeModal } = useModal()
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
+  const [modalType, setModalType] = useState<
+    'edit' | 'deactivate' | 'delete' | null
+  >(null)
+  const [selectedService, setSelectedService] = useState<Service | null>(null)
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -53,27 +57,20 @@ export const ServicesCard = () => {
     fetchCourses()
   }, [])
 
-  // const handleClassCreate = (e: React.FormEvent) => {
-  // 	e.preventDefault()
-  // 	// TODO: Replace with actual create logic
-  // 	console.log('Create class:', newClassName, 'for', modalCategory)
-  // 	handleCloseModal()
-  // }
-
   // Dropdown action handlers
   const handleEdit = (service: Service) => {
-    // TODO: Open edit modal with service data
-    alert(`Edit service: ${service.name}`)
+    setSelectedService(service)
+    setModalType('edit')
     setOpenDropdownId(null)
   }
   const handleDeactivate = (service: Service) => {
-    // TODO: Implement deactivate logic
-    alert(`Deactivate service: ${service.name}`)
+    setSelectedService(service)
+    setModalType('deactivate')
     setOpenDropdownId(null)
   }
   const handleDelete = (service: Service) => {
-    // TODO: Implement delete logic
-    alert(`Delete service: ${service.name}`)
+    setSelectedService(service)
+    setModalType('delete')
     setOpenDropdownId(null)
   }
 
@@ -171,7 +168,9 @@ export const ServicesCard = () => {
                           {service.duration_minutes} minutes
                         </TableCell>
                         <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          <Badge color="success">Active</Badge>
+                          <Badge size="sm" color="success">
+                            Active
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                           <button
@@ -231,6 +230,65 @@ export const ServicesCard = () => {
         <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
           <CreateServicesForm />
         </div>
+      </Modal>
+      <Modal
+        isOpen={modalType !== null}
+        onClose={() => setModalType(null)}
+        className="max-w-lg p-6"
+      >
+        {modalType === 'edit' && selectedService && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Edit Service</h2>
+            <CreateServicesForm
+              service={selectedService}
+              onClose={() => setModalType(null)}
+            />
+          </div>
+        )}
+        {modalType === 'deactivate' && selectedService && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Deactivate Service</h2>
+            <p>
+              Are you sure you want to deactivate <b>{selectedService.name}</b>?
+            </p>
+            <div className="mt-6 flex gap-2">
+              <Button
+                onClick={() => {
+                  /* handle deactivate logic */
+                }}
+              >
+                Yes, Deactivate
+              </Button>
+              <Button variant="outline" onClick={() => setModalType(null)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+        {modalType === 'delete' && selectedService && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold text-red-600">
+              Delete Service
+            </h2>
+            <p>
+              Are you sure you want to <b>delete</b>{' '}
+              <b>{selectedService.name}</b>? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex gap-2">
+              <Button
+                color="danger"
+                onClick={() => {
+                  /* handle delete logic */
+                }}
+              >
+                Yes, Delete
+              </Button>
+              <Button variant="outline" onClick={() => setModalType(null)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </>
   )

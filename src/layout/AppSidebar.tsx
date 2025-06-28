@@ -25,6 +25,9 @@ import {
   Banknote,
   CircleUserRound,
   ChartBarIcon,
+  NotebookPen,
+  BanknoteArrowUp,
+  FolderCog,
 } from 'lucide-react'
 // import SidebarWidget from "./SidebarWidget";
 
@@ -52,6 +55,11 @@ const navItems: NavItem[] = [
     path: '/schedule',
   },
   {
+    icon: <NotebookPen strokeWidth={1.5} />,
+    name: 'Bookings',
+    path: '/bookings',
+  },
+  {
     icon: <Users strokeWidth={1.5} />,
     name: 'Customers',
     path: '/customers',
@@ -60,6 +68,16 @@ const navItems: NavItem[] = [
     icon: <Banknote strokeWidth={1.5} />,
     name: 'Pricing',
     path: '/pricing',
+  },
+  {
+    icon: <BanknoteArrowUp strokeWidth={1.5} />,
+    name: 'Transactions',
+    path: '/transactions',
+  },
+  {
+    icon: <FolderCog strokeWidth={1.5} />,
+    name: 'Management',
+    path: '/management',
   },
   {
     icon: <ChartBarIcon strokeWidth={1.5} />,
