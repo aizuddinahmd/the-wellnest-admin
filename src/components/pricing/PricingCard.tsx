@@ -14,6 +14,7 @@ import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import CreateNewPackage from './CreateNewPackage'
 
 interface Service {
   id: string
@@ -110,13 +111,12 @@ export default function PricingCard() {
           </div>
         </div>
         {/* Tabs Section */}
-        <Tabs defaultValue="packages" className="w-full">
-          <div className="px-6">
-            <TabsList>
-              <TabsTrigger value="packages">Packages</TabsTrigger>
-              <TabsTrigger value="membership">Membership</TabsTrigger>
-            </TabsList>
-          </div>
+        <Tabs defaultValue="packages" className="p-4">
+          <TabsList>
+            <TabsTrigger value="packages">Packages</TabsTrigger>
+            <TabsTrigger value="membership">Membership</TabsTrigger>
+          </TabsList>
+
           <TabsContent value="packages">
             <div className="border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800">
               <div className="space-y-6"></div>
@@ -131,25 +131,31 @@ export default function PricingCard() {
                             isHeader
                             className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
                           >
-                            Services
+                            Package Name
                           </TableCell>
                           <TableCell
                             isHeader
                             className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
                           >
-                            Category
+                            Sessions
                           </TableCell>
                           <TableCell
                             isHeader
                             className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
                           >
-                            Base Price
+                            Duration (Days)
                           </TableCell>
                           <TableCell
                             isHeader
                             className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
                           >
-                            Duration
+                            Included Services
+                          </TableCell>
+                          <TableCell
+                            isHeader
+                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                          >
+                            Price
                           </TableCell>
                           <TableCell
                             isHeader
@@ -247,7 +253,11 @@ export default function PricingCard() {
         className="max-w-[1400px] p-6 lg:p-10"
       >
         <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
-          {/* <CreateServicesForm /> */}
+          <CreateNewPackage
+            isOpen={isOpen}
+            onClose={closeModal}
+            onSuccess={() => {}}
+          />
         </div>
       </Modal>
     </>
