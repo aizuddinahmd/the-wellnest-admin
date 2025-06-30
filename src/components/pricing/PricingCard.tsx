@@ -15,34 +15,39 @@ import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import CreateNewPackage from './CreateNewPackage'
+import { toast } from 'sonner'
+import CreateServicesForm from '../services/CreateServicesForm'
 
-interface Service {
+interface Package {
   id: string
-  name: string
+  label: string
   description: string
-  base_price: number
-  category: string
-  duration_minutes: number
+  price: number
+  sessions_included: number
+  // services: Service[]
+  duration_days: number
   status: string
 }
 
 export default function PricingCard() {
   // const router = useRouter()
-  const [services, setServices] = useState<Service[]>([])
+  const [packages, setPackages] = useState<Package[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { isOpen, openModal, closeModal } = useModal()
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
+  const [modalType, setModalType] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch('/api/services')
+        const res = await fetch('/api/packages')
         const data = await res.json()
         if (Array.isArray(data)) {
-          setServices(data)
+          setPackages(data)
         } else {
           setError('Failed to fetch courses')
         }
@@ -63,20 +68,101 @@ export default function PricingCard() {
   // }
 
   // Dropdown action handlers
-  const handleEdit = (service: Service) => {
-    // TODO: Open edit modal with service data
-    alert(`Edit service: ${service.name}`)
+  const handleEdit = (pkg: Package) => {
+    setSelectedPackage(pkg)
+    setModalType('edit')
     setOpenDropdownId(null)
   }
-  const handleDeactivate = (service: Service) => {
-    // TODO: Implement deactivate logic
-    alert(`Deactivate service: ${service.name}`)
+  const handleDeactivate = (pkg: Package) => {
+    setSelectedPackage(pkg)
+    setModalType('deactivate')
     setOpenDropdownId(null)
   }
-  const handleDelete = (service: Service) => {
-    // TODO: Implement delete logic
-    alert(`Delete service: ${service.name}`)
+  const handleDelete = (pkg: Package) => {
+    setSelectedPackage(pkg)
+    setModalType('delete')
     setOpenDropdownId(null)
+  }
+
+  // Refresh services list
+  const refreshServices = async () => {
+    try {
+      const res = await fetch('/api/services')
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setPackages(data)
+      }
+    } catch {}
+  }
+
+  // Handle edit form submit
+  const handleEditSubmit = async (updatedPackage: Partial<Package>) => {
+    if (!selectedPackage) return
+    try {
+      const res = await fetch('/api/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedPackage.id,
+          action: 'edit',
+          ...updatedPackage,
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to update service')
+      toast.success('Package updated successfully')
+      setModalType(null)
+      setSelectedPackage(null)
+      refreshServices()
+    } catch (err) {
+      toast.error('Error updating package', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
+    }
+  }
+
+  // Handle deactivate
+  const handleDeactivateConfirm = async () => {
+    if (!selectedPackage) return
+    try {
+      const res = await fetch('/api/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedPackage.id,
+          action: 'deactivate',
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to deactivate package')
+      toast.success('Package deactivated successfully')
+      setModalType(null)
+      setSelectedPackage(null)
+      refreshServices()
+    } catch (err) {
+      toast.error('Error deactivating package', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
+    }
+  }
+
+  // Handle delete
+  const handleDeleteConfirm = async () => {
+    if (!selectedPackage) return
+    try {
+      const res = await fetch('/api/services', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedPackage.id }),
+      })
+      if (!res.ok) throw new Error('Failed to delete package')
+      toast.success('Package deleted successfully')
+      setModalType(null)
+      setSelectedPackage(null)
+      refreshServices()
+    } catch (err) {
+      toast.error('Error deleting package', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
+    }
   }
 
   return (
@@ -167,24 +253,29 @@ export default function PricingCard() {
                       </TableHeader>
                       {/* Table Body */}
                       <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                        {services.map((service) => (
-                          <TableRow key={service.id}>
+                        {packages.map((pkg) => (
+                          <TableRow key={pkg.id}>
                             <TableCell className="x-5 py-4 text-start sm:px-6">
                               <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
-                                {service.name}
+                                {pkg.label}
                               </span>
                               <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
-                                {service.description}
+                                {pkg.description}
                               </span>
                             </TableCell>
                             <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              {service.category}
+                              {pkg.sessions_included}
                             </TableCell>
                             <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              RM {service.base_price}
+                              {pkg.duration_days
+                                ? `${pkg.duration_days} days`
+                                : '-'}
                             </TableCell>
                             <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              {service.duration_minutes} minutes
+                              {pkg.duration_days} days
+                            </TableCell>
+                            <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                              {pkg.price}
                             </TableCell>
                             <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                               <Badge color="success">Active</Badge>
@@ -196,31 +287,27 @@ export default function PricingCard() {
                                 aria-label="Open actions"
                                 onClick={() =>
                                   setOpenDropdownId(
-                                    openDropdownId === service.id
-                                      ? null
-                                      : service.id,
+                                    openDropdownId === pkg.id ? null : pkg.id,
                                   )
                                 }
                               >
                                 <Ellipsis className="h-4 w-4 cursor-pointer" />
                               </button>
                               <Dropdown
-                                isOpen={openDropdownId === service.id}
+                                isOpen={openDropdownId === pkg.id}
                                 onClose={() => setOpenDropdownId(null)}
                                 className="top-6 right-0 min-w-[160px]"
                               >
-                                <DropdownItem
-                                  onClick={() => handleEdit(service)}
-                                >
+                                <DropdownItem onClick={() => handleEdit(pkg)}>
                                   Edit
                                 </DropdownItem>
                                 <DropdownItem
-                                  onClick={() => handleDeactivate(service)}
+                                  onClick={() => handleDeactivate(pkg)}
                                 >
                                   Deactivate
                                 </DropdownItem>
                                 <DropdownItem
-                                  onClick={() => handleDelete(service)}
+                                  onClick={() => handleDelete(pkg)}
                                   className="text-red-600"
                                 >
                                   Delete
@@ -231,9 +318,14 @@ export default function PricingCard() {
                         ))}
                       </TableBody>
                     </Table>
-                    {services.length === 0 && (
+                    {loading && (
                       <div className="py-8 text-center text-gray-500">
-                        No services found.
+                        Loading...
+                      </div>
+                    )}
+                    {packages.length === 0 && !loading && (
+                      <div className="py-8 text-center text-gray-500">
+                        No packages found.
                       </div>
                     )}
                   </div>
@@ -259,6 +351,69 @@ export default function PricingCard() {
             onSuccess={() => {}}
           />
         </div>
+      </Modal>
+      <Modal
+        isOpen={modalType !== null}
+        onClose={() => setModalType(null)}
+        className={
+          modalType === 'edit' ? 'max-w-[1400px] p-6 lg:p-10' : 'max-w-lg p-6'
+        }
+      >
+        {modalType === 'edit' && selectedPackage && (
+          <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
+            <h2 className="mb-4 text-lg font-bold">Edit Service</h2>
+            {/* <CreateNewPackage
+              package={selectedPackage}
+              onSubmit={handleEditSubmit}
+              // onClose={() => setModalType(null)}
+            /> */}
+          </div>
+        )}
+
+        {modalType === 'deactivate' && selectedPackage && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold">Deactivate Service</h2>
+            <p>
+              Are you sure you want to deactivate <b>{selectedPackage.label}</b>
+              ?
+            </p>
+            <div className="mt-6 flex gap-2">
+              <Button size="sm" onClick={handleDeactivateConfirm}>
+                Yes, Deactivate
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setModalType(null)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+        {modalType === 'delete' && selectedPackage && (
+          <div>
+            <h2 className="mb-4 text-lg font-bold text-red-600">
+              Delete Service
+            </h2>
+            <p>
+              Are you sure you want to <b>delete</b>{' '}
+              <b>{selectedPackage.label}</b>? This action cannot be undone.
+            </p>
+            <div className="mt-6 flex gap-2">
+              <Button size="sm" onClick={handleDeleteConfirm}>
+                Yes, Delete
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setModalType(null)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
     </>
   )

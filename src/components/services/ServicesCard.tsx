@@ -345,8 +345,14 @@ export const ServicesCard = () => {
               Are you sure you want to deactivate <b>{selectedService.name}</b>?
             </p>
             <div className="mt-6 flex gap-2">
-              <Button onClick={handleDeactivateConfirm}>Yes, Deactivate</Button>
-              <Button variant="outline" onClick={() => setModalType(null)}>
+              <Button size="sm" onClick={handleDeactivateConfirm}>
+                Yes, Deactivate
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setModalType(null)}
+              >
                 Cancel
               </Button>
             </div>
@@ -362,8 +368,14 @@ export const ServicesCard = () => {
               <b>{selectedService.name}</b>? This action cannot be undone.
             </p>
             <div className="mt-6 flex gap-2">
-              <Button onClick={handleDeleteConfirm}>Yes, Delete</Button>
-              <Button variant="outline" onClick={() => setModalType(null)}>
+              <Button size="sm" onClick={handleDeleteConfirm}>
+                Yes, Delete
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setModalType(null)}
+              >
                 Cancel
               </Button>
             </div>

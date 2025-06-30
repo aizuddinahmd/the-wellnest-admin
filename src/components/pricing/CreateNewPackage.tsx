@@ -260,7 +260,7 @@ export default function CreateNewPackage({
         {error && <div className="text-sm text-red-600">{error}</div>}
         {success && <div className="text-sm text-green-600">{success}</div>}
         <div className="flex justify-end">
-          <Button type="submit" disabled={loading}>
+          <Button size="sm" type="submit" disabled={loading}>
             {loading ? 'Submitting...' : 'Create Package'}
           </Button>
         </div>
