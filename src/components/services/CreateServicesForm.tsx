@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDownIcon } from '@/icons'
 import ComponentCard from '../common/ComponentCard'
 import Input from '../form/input/InputField'
@@ -9,7 +9,23 @@ import { useDropzone } from 'react-dropzone'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import Button from '../ui/button/Button'
 
-export default function CreateServicesForm() {
+interface Service {
+  id: string
+  name: string
+  description: string
+  base_price: number
+  category: string
+  duration_minutes: number
+  status: string
+}
+
+interface CreateServicesFormProps {
+  service?: Service
+}
+
+export default function CreateServicesForm({
+  service,
+}: CreateServicesFormProps) {
   const options = [
     { value: 'Pilates', label: 'Pilates' },
     { value: 'Physio', label: 'Physio' },
@@ -28,7 +44,6 @@ export default function CreateServicesForm() {
   const [singlePrice, setSinglePrice] = useState('')
 
   // Separate price states for each type
-
   const [packageType, setPackageType] = useState({
     sessions: '',
     price: '',
@@ -39,6 +54,17 @@ export default function CreateServicesForm() {
     price: '',
     durationDays: '',
   })
+
+  useEffect(() => {
+    if (service) {
+      setName(service.name || '')
+      setDescription(service.description || '')
+      setCategory(service.category || options[0].value)
+      setDuration(service.duration_minutes || 0)
+      setSinglePrice(service.base_price ? String(service.base_price) : '')
+      // Optionally prefill packageType and membership if your service model supports it
+    }
+  }, [service])
 
   const handleSelectChange = (value: string) => {
     setCategory(value)

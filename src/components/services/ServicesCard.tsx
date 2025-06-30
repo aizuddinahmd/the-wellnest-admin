@@ -234,10 +234,12 @@ export const ServicesCard = () => {
       <Modal
         isOpen={modalType !== null}
         onClose={() => setModalType(null)}
-        className="max-w-lg p-6"
+        className={
+          modalType === 'edit' ? 'max-w-[1400px] p-6 lg:p-10' : 'max-w-lg p-6'
+        }
       >
         {modalType === 'edit' && selectedService && (
-          <div>
+          <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
             <h2 className="mb-4 text-lg font-bold">Edit Service</h2>
             <CreateServicesForm
               service={selectedService}
@@ -245,6 +247,7 @@ export const ServicesCard = () => {
             />
           </div>
         )}
+
         {modalType === 'deactivate' && selectedService && (
           <div>
             <h2 className="mb-4 text-lg font-bold">Deactivate Service</h2>
