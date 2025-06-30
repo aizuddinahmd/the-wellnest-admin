@@ -14,10 +14,12 @@ import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import { toast } from 'sonner'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface Service {
   id: string
   name: string
+  image_url: string
   description: string
   base_price: number
   category: string
@@ -294,7 +296,12 @@ export const ServicesCard = () => {
                     ))}
                   </TableBody>
                 </Table>
-                {services.length === 0 && (
+                {loading && (
+                  <div className="py-8 text-center text-gray-500">
+                    Loading...
+                  </div>
+                )}
+                {services.length === 0 && !loading && (
                   <div className="py-8 text-center text-gray-500">
                     No services found.
                   </div>
@@ -326,7 +333,7 @@ export const ServicesCard = () => {
             <CreateServicesForm
               service={selectedService}
               onSubmit={handleEditSubmit}
-              onClose={() => setModalType(null)}
+              // onClose={() => setModalType(null)}
             />
           </div>
         )}

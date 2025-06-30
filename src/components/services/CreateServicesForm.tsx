@@ -15,6 +15,7 @@ interface Service {
   description: string
   base_price: number
   category: string
+  image_url: string
   duration_minutes: number
   status: string
 }
@@ -64,6 +65,7 @@ export default function CreateServicesForm({
       setCategory(service.category || options[0].value)
       setDuration(service.duration_minutes || 0)
       setSinglePrice(service.base_price ? String(service.base_price) : '')
+      setImageUrl(service.image_url || '')
       // Optionally prefill packageType and membership if your service model supports it
     }
   }, [service])
