@@ -105,7 +105,9 @@ export const ServicesCard = () => {
       setSelectedService(null)
       refreshServices()
     } catch (err) {
-      toast.error('Error updating service')
+      toast.error('Error updating service', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
     }
   }
 
@@ -127,7 +129,9 @@ export const ServicesCard = () => {
       setSelectedService(null)
       refreshServices()
     } catch (err) {
-      toast.error('Error deactivating service')
+      toast.error('Error deactivating service', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
     }
   }
 
@@ -146,7 +150,9 @@ export const ServicesCard = () => {
       setSelectedService(null)
       refreshServices()
     } catch (err) {
-      toast.error('Error deleting service')
+      toast.error('Error deleting service', {
+        description: err instanceof Error ? err.message : 'Unknown error',
+      })
     }
   }
 
