@@ -13,6 +13,7 @@ import CreateServicesForm from './CreateServicesForm'
 import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
+import { toast } from 'sonner'
 
 interface Service {
   id: string
@@ -72,6 +73,81 @@ export const ServicesCard = () => {
     setSelectedService(service)
     setModalType('delete')
     setOpenDropdownId(null)
+  }
+
+  // Refresh services list
+  const refreshServices = async () => {
+    try {
+      const res = await fetch('/api/services')
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setServices(data)
+      }
+    } catch {}
+  }
+
+  // Handle edit form submit
+  const handleEditSubmit = async (updatedService: Partial<Service>) => {
+    if (!selectedService) return
+    try {
+      const res = await fetch('/api/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedService.id,
+          action: 'edit',
+          ...updatedService,
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to update service')
+      toast.success('Service updated successfully')
+      setModalType(null)
+      setSelectedService(null)
+      refreshServices()
+    } catch (err) {
+      toast.error('Error updating service')
+    }
+  }
+
+  // Handle deactivate
+  const handleDeactivateConfirm = async () => {
+    if (!selectedService) return
+    try {
+      const res = await fetch('/api/services', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedService.id,
+          action: 'deactivate',
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to deactivate service')
+      toast.success('Service deactivated successfully')
+      setModalType(null)
+      setSelectedService(null)
+      refreshServices()
+    } catch (err) {
+      toast.error('Error deactivating service')
+    }
+  }
+
+  // Handle delete
+  const handleDeleteConfirm = async () => {
+    if (!selectedService) return
+    try {
+      const res = await fetch('/api/services', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedService.id }),
+      })
+      if (!res.ok) throw new Error('Failed to delete service')
+      toast.success('Service deleted successfully')
+      setModalType(null)
+      setSelectedService(null)
+      refreshServices()
+    } catch (err) {
+      toast.error('Error deleting service')
+    }
   }
 
   return (
@@ -243,6 +319,7 @@ export const ServicesCard = () => {
             <h2 className="mb-4 text-lg font-bold">Edit Service</h2>
             <CreateServicesForm
               service={selectedService}
+              onSubmit={handleEditSubmit}
               onClose={() => setModalType(null)}
             />
           </div>
@@ -255,13 +332,7 @@ export const ServicesCard = () => {
               Are you sure you want to deactivate <b>{selectedService.name}</b>?
             </p>
             <div className="mt-6 flex gap-2">
-              <Button
-                onClick={() => {
-                  /* handle deactivate logic */
-                }}
-              >
-                Yes, Deactivate
-              </Button>
+              <Button onClick={handleDeactivateConfirm}>Yes, Deactivate</Button>
               <Button variant="outline" onClick={() => setModalType(null)}>
                 Cancel
               </Button>
@@ -278,14 +349,7 @@ export const ServicesCard = () => {
               <b>{selectedService.name}</b>? This action cannot be undone.
             </p>
             <div className="mt-6 flex gap-2">
-              <Button
-                color="danger"
-                onClick={() => {
-                  /* handle delete logic */
-                }}
-              >
-                Yes, Delete
-              </Button>
+              <Button onClick={handleDeleteConfirm}>Yes, Delete</Button>
               <Button variant="outline" onClick={() => setModalType(null)}>
                 Cancel
               </Button>

@@ -21,10 +21,12 @@ interface Service {
 
 interface CreateServicesFormProps {
   service?: Service
+  onSubmit?: (updatedService: Partial<Service>) => void | Promise<void>
 }
 
 export default function CreateServicesForm({
   service,
+  onSubmit,
 }: CreateServicesFormProps) {
   const options = [
     { value: 'Pilates', label: 'Pilates' },
@@ -91,6 +93,18 @@ export default function CreateServicesForm({
     setLoading(true)
     setMessage(null)
     try {
+      if (onSubmit) {
+        await onSubmit({
+          name,
+          description,
+          category,
+          duration_minutes: duration,
+          base_price: singlePrice ? parseFloat(singlePrice) : undefined,
+          // Add other fields as needed
+        })
+        setLoading(false)
+        return
+      }
       const res = await fetch('/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

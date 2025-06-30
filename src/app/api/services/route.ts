@@ -111,3 +111,93 @@ export async function GET() {
     )
   }
 }
+
+// PATCH: Edit or deactivate a service
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json()
+    const supabase = await createClient()
+    const { id, action, ...fields } = body
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Service id is required' },
+        { status: 400 },
+      )
+    }
+
+    if (action === 'deactivate') {
+      // Only deactivate (set is_active to false)
+      const { error } = await supabase
+        .from('services')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 })
+      }
+      return NextResponse.json(
+        { message: 'Service deactivated' },
+        { status: 200 },
+      )
+    } else if (action === 'edit') {
+      // Edit all fields
+      const updateFields = {
+        name: fields.name,
+        description: fields.description,
+        category: fields.category,
+        duration_minutes: fields.duration_minutes,
+        base_price: fields.base_price,
+        image_url: fields.image_url,
+        is_active: fields.is_active,
+        updated_at: new Date().toISOString(),
+      }
+      // Remove undefined fields
+      const updateFieldsRecord = updateFields as Record<string, unknown>
+      Object.keys(updateFieldsRecord).forEach(
+        (key) =>
+          updateFieldsRecord[key] === undefined &&
+          delete updateFieldsRecord[key],
+      )
+      const { error } = await supabase
+        .from('services')
+        .update(updateFields)
+        .eq('id', id)
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 })
+      }
+      return NextResponse.json({ message: 'Service updated' }, { status: 200 })
+    } else {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    }
+  } catch (error) {
+    console.error('Error updating service:', error)
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
+    )
+  }
+}
+
+// DELETE: Delete a service
+export async function DELETE(request: Request) {
+  try {
+    const { id } = await request.json()
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Service id is required' },
+        { status: 400 },
+      )
+    }
+    const supabase = await createClient()
+    const { error } = await supabase.from('services').delete().eq('id', id)
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+    return NextResponse.json({ message: 'Service deleted' }, { status: 200 })
+  } catch (error) {
+    console.error('Error deleting service:', error)
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
+    )
+  }
+}

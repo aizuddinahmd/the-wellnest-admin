@@ -1,17 +1,18 @@
-import { Outfit } from "next/font/google";
-import "./globals.css";
+import { Outfit } from 'next/font/google'
+import './globals.css'
 
-import { SidebarProvider } from "@/context/SidebarContext";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { SidebarProvider } from '@/context/SidebarContext'
+import { ThemeProvider } from '@/context/ThemeContext'
+import { Toaster } from '@/components/ui/sonner'
 
 const outfit = Outfit({
-  subsets: ["latin"],
-});
+  subsets: ['latin'],
+})
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
@@ -19,7 +20,8 @@ export default function RootLayout({
         <ThemeProvider>
           <SidebarProvider>{children}</SidebarProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
-  );
+  )
 }
