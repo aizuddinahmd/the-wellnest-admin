@@ -13,10 +13,12 @@ import { Ellipsis, FilterIcon, PlusIcon } from 'lucide-react'
 import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import CreateNewPackage from './CreateNewPackage'
+import { TabButton } from '../ui/tabs/TabButton'
+import { TabContent } from '../ui/tabs/TabContent'
 import { toast } from 'sonner'
-import CreateServicesForm from '../services/CreateServicesForm'
+import SpinnerTwo from '../ui/spinners/SpinnerTwo'
+// import CreateServicesForm from '../services/CreateServicesForm'
 
 interface Package {
   id: string
@@ -38,6 +40,7 @@ export default function PricingCard() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null)
   const [modalType, setModalType] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('package')
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -197,148 +200,271 @@ export default function PricingCard() {
           </div>
         </div>
         {/* Tabs Section */}
-        <Tabs defaultValue="packages" className="p-4">
-          <TabsList>
-            <TabsTrigger value="packages">Packages</TabsTrigger>
-            <TabsTrigger value="membership">Membership</TabsTrigger>
-          </TabsList>
+        <div className="rounded-xl border border-gray-200 p-6 dark:border-gray-800">
+          <div className="border-b border-gray-200 dark:border-gray-800">
+            <nav className="-mb-px flex space-x-2 overflow-x-auto [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 dark:[&::-webkit-scrollbar-track]:bg-transparent">
+              <TabButton
+                key={'package'}
+                id={'package'}
+                label={'Package'}
+                isActive={activeTab === 'package'}
+                onClick={() => setActiveTab('package')}
+              />
+              <TabButton
+                key={'membership'}
+                id={'membership'}
+                label={'Membership'}
+                isActive={activeTab === 'membership'}
+                onClick={() => setActiveTab('membership')}
+              />
+            </nav>
+          </div>
 
-          <TabsContent value="packages">
-            <div className="border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800">
-              <div className="space-y-6"></div>
-              <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-                {/* Courses Table */}
-                <div className="max-w-full overflow-x-auto">
-                  <div className="min-w-[1102px]">
-                    <Table>
-                      <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                        <TableRow>
-                          <TableCell
-                            isHeader
-                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+          <div className="pt-4 dark:border-gray-800">
+            <TabContent
+              key={'package'}
+              id={'package'}
+              title={'Package'}
+              isActive={activeTab === 'package'}
+            >
+              <Table>
+                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                  <TableRow>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Package Name
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Sessions
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Duration (Days)
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Included Services
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Price
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Status
+                    </TableCell>
+                  </TableRow>
+                </TableHeader>
+                {/* Table Body */}
+                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                  {packages.map((pkg) => (
+                    <TableRow key={pkg.id}>
+                      <TableCell className="x-5 py-4 text-start sm:px-6">
+                        <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
+                          {pkg.label}
+                        </span>
+                        <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
+                          {pkg.description}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.sessions_included}
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.duration_days ? `${pkg.duration_days} days` : '-'}
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.duration_days} days
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.price}
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <Badge color="success">Active</Badge>
+                      </TableCell>
+                      <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <button
+                          type="button"
+                          className="dropdown-toggle"
+                          aria-label="Open actions"
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === pkg.id ? null : pkg.id,
+                            )
+                          }
+                        >
+                          <Ellipsis className="h-4 w-4 cursor-pointer" />
+                        </button>
+                        <Dropdown
+                          isOpen={openDropdownId === pkg.id}
+                          onClose={() => setOpenDropdownId(null)}
+                          className="top-6 right-0 min-w-[160px]"
+                        >
+                          <DropdownItem onClick={() => handleEdit(pkg)}>
+                            Edit
+                          </DropdownItem>
+                          <DropdownItem onClick={() => handleDeactivate(pkg)}>
+                            Deactivate
+                          </DropdownItem>
+                          <DropdownItem
+                            onClick={() => handleDelete(pkg)}
+                            className="text-red-600"
                           >
-                            Package Name
-                          </TableCell>
-                          <TableCell
-                            isHeader
-                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                          >
-                            Sessions
-                          </TableCell>
-                          <TableCell
-                            isHeader
-                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                          >
-                            Duration (Days)
-                          </TableCell>
-                          <TableCell
-                            isHeader
-                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                          >
-                            Included Services
-                          </TableCell>
-                          <TableCell
-                            isHeader
-                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                          >
-                            Price
-                          </TableCell>
-                          <TableCell
-                            isHeader
-                            className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                          >
-                            Status
-                          </TableCell>
-                        </TableRow>
-                      </TableHeader>
-                      {/* Table Body */}
-                      <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                        {packages.map((pkg) => (
-                          <TableRow key={pkg.id}>
-                            <TableCell className="x-5 py-4 text-start sm:px-6">
-                              <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
-                                {pkg.label}
-                              </span>
-                              <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
-                                {pkg.description}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              {pkg.sessions_included}
-                            </TableCell>
-                            <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              {pkg.duration_days
-                                ? `${pkg.duration_days} days`
-                                : '-'}
-                            </TableCell>
-                            <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              {pkg.duration_days} days
-                            </TableCell>
-                            <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              {pkg.price}
-                            </TableCell>
-                            <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              <Badge color="success">Active</Badge>
-                            </TableCell>
-                            <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                              <button
-                                type="button"
-                                className="dropdown-toggle"
-                                aria-label="Open actions"
-                                onClick={() =>
-                                  setOpenDropdownId(
-                                    openDropdownId === pkg.id ? null : pkg.id,
-                                  )
-                                }
-                              >
-                                <Ellipsis className="h-4 w-4 cursor-pointer" />
-                              </button>
-                              <Dropdown
-                                isOpen={openDropdownId === pkg.id}
-                                onClose={() => setOpenDropdownId(null)}
-                                className="top-6 right-0 min-w-[160px]"
-                              >
-                                <DropdownItem onClick={() => handleEdit(pkg)}>
-                                  Edit
-                                </DropdownItem>
-                                <DropdownItem
-                                  onClick={() => handleDeactivate(pkg)}
-                                >
-                                  Deactivate
-                                </DropdownItem>
-                                <DropdownItem
-                                  onClick={() => handleDelete(pkg)}
-                                  className="text-red-600"
-                                >
-                                  Delete
-                                </DropdownItem>
-                              </Dropdown>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                    {loading && (
-                      <div className="py-8 text-center text-gray-500">
-                        Loading...
-                      </div>
-                    )}
-                    {packages.length === 0 && !loading && (
-                      <div className="py-8 text-center text-gray-500">
-                        No packages found.
-                      </div>
-                    )}
-                  </div>
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {loading && (
+                <div className="flex justify-center py-8">
+                  <SpinnerTwo />
                 </div>
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="membership">
-            {/* ... Membership Table or Content ... */}
-            {/* You can duplicate the table or show different data here */}
-          </TabsContent>
-        </Tabs>
+              )}
+              {packages.length === 0 && !loading && (
+                <div className="py-8 text-center text-gray-500">
+                  No packages found.
+                </div>
+              )}
+            </TabContent>
+            <TabContent
+              key={'membership'}
+              id={'membership'}
+              title={'Membership'}
+              isActive={activeTab === 'membership'}
+            >
+              <Table>
+                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                  <TableRow>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Membership Name
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Sessions
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Duration (Days)
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Included Services
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Price
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Status
+                    </TableCell>
+                  </TableRow>
+                </TableHeader>
+                {/* Table Body */}
+                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                  {packages.map((pkg) => (
+                    <TableRow key={pkg.id}>
+                      <TableCell className="x-5 py-4 text-start sm:px-6">
+                        <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
+                          {pkg.label}
+                        </span>
+                        <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
+                          {pkg.description}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.sessions_included}
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.duration_days ? `${pkg.duration_days} days` : '-'}
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.duration_days} days
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {pkg.price}
+                      </TableCell>
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <Badge color="success">Active</Badge>
+                      </TableCell>
+                      <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <button
+                          type="button"
+                          className="dropdown-toggle"
+                          aria-label="Open actions"
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === pkg.id ? null : pkg.id,
+                            )
+                          }
+                        >
+                          <Ellipsis className="h-4 w-4 cursor-pointer" />
+                        </button>
+                        <Dropdown
+                          isOpen={openDropdownId === pkg.id}
+                          onClose={() => setOpenDropdownId(null)}
+                          className="top-6 right-0 min-w-[160px]"
+                        >
+                          <DropdownItem onClick={() => handleEdit(pkg)}>
+                            Edit
+                          </DropdownItem>
+                          <DropdownItem onClick={() => handleDeactivate(pkg)}>
+                            Deactivate
+                          </DropdownItem>
+                          <DropdownItem
+                            onClick={() => handleDelete(pkg)}
+                            className="text-red-600"
+                          >
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {loading && (
+                <div className="py-8 text-center text-gray-500">Loading...</div>
+              )}
+              {packages.length === 0 && !loading && (
+                <div className="py-8 text-center text-gray-500">
+                  No packages found.
+                </div>
+              )}
+            </TabContent>
+          </div>
+        </div>
       </div>
+
       <Modal
         isOpen={isOpen}
         onClose={closeModal}

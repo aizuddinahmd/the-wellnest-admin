@@ -14,7 +14,8 @@ import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import { toast } from 'sonner'
-import { Skeleton } from '@/components/ui/skeleton'
+// import { Skeleton } from '@/components/ui/skeleton'
+import SpinnerTwo from '../ui/spinners/SpinnerTwo'
 
 interface Service {
   id: string
@@ -194,119 +195,115 @@ export const ServicesCard = () => {
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
             {/* Courses Table */}
             <div className="max-w-full overflow-x-auto">
-              <div className="min-w-[1102px]">
-                <Table>
-                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                    <TableRow>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Services
+              <Table>
+                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                  <TableRow>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Services
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Category
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Base Price
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Duration
+                    </TableCell>
+                    <TableCell
+                      isHeader
+                      className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+                    >
+                      Status
+                    </TableCell>
+                  </TableRow>
+                </TableHeader>
+                {/* Table Body */}
+                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                  {services.map((service) => (
+                    <TableRow key={service.id}>
+                      <TableCell className="x-5 py-4 text-start sm:px-6">
+                        <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
+                          {service.name}
+                        </span>
+                        <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
+                          {service.description}
+                        </span>
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Category
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {service.category}
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Base Price
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        RM {service.base_price}
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Duration
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        {service.duration_minutes} minutes
                       </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Status
+                      <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <Badge size="sm" color="success">
+                          Active
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                        <button
+                          type="button"
+                          className="dropdown-toggle"
+                          aria-label="Open actions"
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === service.id ? null : service.id,
+                            )
+                          }
+                        >
+                          <Ellipsis className="h-4 w-4 cursor-pointer" />
+                        </button>
+                        <Dropdown
+                          isOpen={openDropdownId === service.id}
+                          onClose={() => setOpenDropdownId(null)}
+                          className="top-6 right-0 min-w-[160px]"
+                        >
+                          <DropdownItem onClick={() => handleEdit(service)}>
+                            Edit
+                          </DropdownItem>
+                          <DropdownItem
+                            onClick={() => handleDeactivate(service)}
+                          >
+                            Deactivate
+                          </DropdownItem>
+                          <DropdownItem
+                            onClick={() => handleDelete(service)}
+                            className="text-red-600"
+                          >
+                            Delete
+                          </DropdownItem>
+                        </Dropdown>
                       </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  {/* Table Body */}
-                  <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                    {services.map((service) => (
-                      <TableRow key={service.id}>
-                        <TableCell className="x-5 py-4 text-start sm:px-6">
-                          <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
-                            {service.name}
-                          </span>
-                          <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
-                            {service.description}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          {service.category}
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          RM {service.base_price}
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          {service.duration_minutes} minutes
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          <Badge size="sm" color="success">
-                            Active
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          <button
-                            type="button"
-                            className="dropdown-toggle"
-                            aria-label="Open actions"
-                            onClick={() =>
-                              setOpenDropdownId(
-                                openDropdownId === service.id
-                                  ? null
-                                  : service.id,
-                              )
-                            }
-                          >
-                            <Ellipsis className="h-4 w-4 cursor-pointer" />
-                          </button>
-                          <Dropdown
-                            isOpen={openDropdownId === service.id}
-                            onClose={() => setOpenDropdownId(null)}
-                            className="top-6 right-0 min-w-[160px]"
-                          >
-                            <DropdownItem onClick={() => handleEdit(service)}>
-                              Edit
-                            </DropdownItem>
-                            <DropdownItem
-                              onClick={() => handleDeactivate(service)}
-                            >
-                              Deactivate
-                            </DropdownItem>
-                            <DropdownItem
-                              onClick={() => handleDelete(service)}
-                              className="text-red-600"
-                            >
-                              Delete
-                            </DropdownItem>
-                          </Dropdown>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {loading && (
-                  <div className="py-8 text-center text-gray-500">
-                    Loading...
-                  </div>
-                )}
-                {services.length === 0 && !loading && (
-                  <div className="py-8 text-center text-gray-500">
-                    No services found.
-                  </div>
-                )}
-              </div>
+                  ))}
+                </TableBody>
+              </Table>
+              {loading && (
+                <div className="flex justify-center py-8">
+                  <SpinnerTwo />
+                </div>
+              )}
+              {services.length === 0 && !loading && (
+                <div className="py-8 text-center text-gray-500">
+                  No services found.
+                </div>
+              )}
             </div>
           </div>
         </div>
