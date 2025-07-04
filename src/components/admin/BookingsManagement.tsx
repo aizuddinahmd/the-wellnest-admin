@@ -13,15 +13,25 @@ import { Ellipsis, FilterIcon, PlusIcon } from 'lucide-react'
 import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
+import SpinnerTwo from '../ui/spinners/SpinnerTwo'
+import BookingsForm from '../bookings/BookingsForm'
 
-interface Service {
+interface Booking {
   id: string
-  name: string
-  description: string
-  base_price: number
-  category: string
-  duration_minutes: number
+  user: {
+    full_name: string
+    email: string
+  }
+  event: {
+    title: string
+  }
+  staff: {
+    full_name: string
+  }
+  notes: string
   status: string
+  created_at: string
+  updated_at: string
 }
 
 export const BookingsManagement = ({
@@ -32,21 +42,22 @@ export const BookingsManagement = ({
   description: string
 }) => {
   // const router = useRouter()
-  const [services, setServices] = useState<Service[]>([])
+  const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { isOpen, openModal, closeModal } = useModal()
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchBookings = async () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch('/api/services')
+        const res = await fetch('/api/bookings')
         const data = await res.json()
+        console.log(data)
         if (Array.isArray(data)) {
-          setServices(data)
+          setBookings(data)
         } else {
           setError('Failed to fetch courses')
         }
@@ -56,7 +67,7 @@ export const BookingsManagement = ({
         setLoading(false)
       }
     }
-    fetchCourses()
+    fetchBookings()
   }, [])
 
   // const handleClassCreate = (e: React.FormEvent) => {
@@ -67,7 +78,7 @@ export const BookingsManagement = ({
   // }
 
   // Dropdown action handlers
-  const handleEdit = (service: Service) => {
+  const handleEdit = (booking: Booking) => {
     // TODO: Open edit modal with service data
     alert(`Edit service: ${service.name}`)
     setOpenDropdownId(null)
@@ -114,128 +125,121 @@ export const BookingsManagement = ({
             </Button>
           </div>
         </div>
-        <div className="border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800">
-          <div className="space-y-6"></div>
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-            {/* Bookings Table */}
-            <div className="max-w-full overflow-x-auto">
-              <div className="min-w-[1102px]">
-                <Table>
-                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                    <TableRow>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Customer Name
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Time
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Events
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Instructor
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Package
-                      </TableCell>
-                      <TableCell
-                        isHeader
-                        className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
-                      >
-                        Status
-                      </TableCell>
-                    </TableRow>
-                  </TableHeader>
-                  {/* Table Body */}
-                  <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                    {services.map((service) => (
-                      <TableRow key={service.id}>
-                        <TableCell className="x-5 py-4 text-start sm:px-6">
-                          <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
-                            {service.name}
-                          </span>
-                          <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
-                            {service.description}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          {service.category}
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          RM {service.base_price}
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          {service.duration_minutes} minutes
-                        </TableCell>
-                        <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          <Badge size="sm" color="success">
-                            Active
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                          <button
-                            type="button"
-                            className="dropdown-toggle"
-                            aria-label="Open actions"
-                            onClick={() =>
-                              setOpenDropdownId(
-                                openDropdownId === service.id
-                                  ? null
-                                  : service.id,
-                              )
-                            }
-                          >
-                            <Ellipsis className="h-4 w-4 cursor-pointer" />
-                          </button>
-                          <Dropdown
-                            isOpen={openDropdownId === service.id}
-                            onClose={() => setOpenDropdownId(null)}
-                            className="top-6 right-0 min-w-[160px]"
-                          >
-                            <DropdownItem onClick={() => handleEdit(service)}>
-                              Edit
-                            </DropdownItem>
-                            <DropdownItem
-                              onClick={() => handleDeactivate(service)}
-                            >
-                              Deactivate
-                            </DropdownItem>
-                            <DropdownItem
-                              onClick={() => handleDelete(service)}
-                              className="text-red-600"
-                            >
-                              Delete
-                            </DropdownItem>
-                          </Dropdown>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {services.length === 0 && (
-                  <div className="py-8 text-center text-gray-500">
-                    No services found.
-                  </div>
-                )}
-              </div>
-            </div>
+
+        <Table>
+          <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+            <TableRow>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+              >
+                Customer Name
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+              >
+                Time
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+              >
+                Events
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+              >
+                Instructor
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+              >
+                Package
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-start font-medium text-gray-500 dark:text-gray-400"
+              >
+                Status
+              </TableCell>
+            </TableRow>
+          </TableHeader>
+          {/* Table Body */}
+          <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+            {bookings.map((booking) => (
+              <TableRow key={booking.id}>
+                <TableCell className="x-5 py-4 text-start sm:px-6">
+                  <span className="text-theme-sm block font-medium text-gray-800 dark:text-white/90">
+                    {booking.user.full_name}
+                  </span>
+                  <span className="text-theme-xs block text-gray-500 dark:text-gray-400">
+                    {booking.user.email}
+                  </span>
+                </TableCell>
+                <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                  {booking.event.title}
+                </TableCell>
+                <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                  {booking.status}
+                </TableCell>
+                <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                  {booking.notes}
+                </TableCell>
+                <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                  <Badge size="sm" color="success">
+                    Active
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
+                  <button
+                    type="button"
+                    className="dropdown-toggle"
+                    aria-label="Open actions"
+                    onClick={() =>
+                      setOpenDropdownId(
+                        openDropdownId === booking.id ? null : booking.id,
+                      )
+                    }
+                  >
+                    <Ellipsis className="h-4 w-4 cursor-pointer" />
+                  </button>
+                  <Dropdown
+                    isOpen={openDropdownId === booking.id}
+                    onClose={() => setOpenDropdownId(null)}
+                    className="top-6 right-0 min-w-[160px]"
+                  >
+                    <DropdownItem onClick={() => handleEdit(booking)}>
+                      Edit
+                    </DropdownItem>
+                    <DropdownItem onClick={() => handleDeactivate(booking)}>
+                      Deactivate
+                    </DropdownItem>
+                    <DropdownItem
+                      onClick={() => handleDelete(booking)}
+                      className="text-red-600"
+                    >
+                      Delete
+                    </DropdownItem>
+                  </Dropdown>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {loading && (
+          <div className="flex justify-center py-8">
+            <SpinnerTwo />
           </div>
-        </div>
+        )}
+        {bookings.length === 0 && !loading && (
+          <div className="py-8 text-center text-gray-500">
+            No bookings found.
+          </div>
+        )}
       </div>
       <Modal
         isOpen={isOpen}
@@ -244,6 +248,7 @@ export const BookingsManagement = ({
       >
         <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
           {/* <CreateServicesForm /> */}
+          <BookingsForm />
         </div>
       </Modal>
     </>
