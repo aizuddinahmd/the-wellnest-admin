@@ -1,146 +1,294 @@
-import React, { useState } from 'react'
-
-interface Booking {
-  id: string
-  user: {
-    full_name: string
-    email: string
-  }
-}
+import React, { useState, useEffect, useRef } from 'react'
+import { Modal } from '../ui/modal'
+import { Dropdown } from '../ui/dropdown/Dropdown'
+import { DropdownItem } from '../ui/dropdown/DropdownItem'
 
 interface Customer {
   id: string
   name: string
   phone: string
   email: string
-  status: string
-  registrationDate: string
+  status?: string
+  registrationDate?: string
 }
 
 export default function BookingsForm() {
-  const [form, setForm] = useState<Booking>({
-    id: '',
-    user: {
-      full_name: '',
-      email: '',
-    },
-  })
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
-  //   const [eventsToday, setEventsToday] = useState<Event[]>([])
-  const [customers, setCustomers] = useState<any[]>([])
+  const [purpose, setPurpose] = useState<'Consultation' | 'OTC'>('Consultation')
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  )
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const [registerName, setRegisterName] = useState('')
+  const [registerEmail, setRegisterEmail] = useState('')
+  const [registerPhone, setRegisterPhone] = useState('')
+  const [registering, setRegistering] = useState(false)
+  const [registerError, setRegisterError] = useState<string | null>(null)
+  const [registerSuccess, setRegisterSuccess] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+  // Fetch customers (simulate API call)
+  useEffect(() => {
+    // Replace with your API call
+    const fetchCustomers = async () => {
+      const res = await fetch('/api/users')
+      const data = await res.json()
+      setCustomers(data)
+    }
+    fetchCustomers()
+  }, [])
+
+  // Filtered customers for dropdown
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.email.toLowerCase().includes(search.toLowerCase()) ||
+      c.phone.toLowerCase().includes(search.toLowerCase()),
+  )
+
+  // Open dropdown when input is focused
+  const handleInputFocus = () => setDropdownOpen(true)
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  function toggleDropdown() {
+    setIsOpen(!isOpen)
   }
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  function closeDropdown() {
+    setIsOpen(false)
+  }
+
+  // Register new customer
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setMessage(null)
+    setRegistering(true)
+    setRegisterError(null)
+    setRegisterSuccess(null)
     try {
-      const res = await fetch('/api/customers', {
+      const res = await fetch('/api/register-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          eventId: form.eventId,
+          name: registerName,
+          email: registerEmail,
+          phone: registerPhone,
         }),
       })
       const data = await res.json()
-      // console.log('data', data)
       if (!res.ok) {
-        setMessage(data.error || 'Registration failed')
-        // closeModal()
+        setRegisterError(data.error || 'Registration failed')
       } else {
-        setMessage('Registration successful!')
-        // closeModal()
-        setForm({ name: '', phone: '', email: '', eventId: '', search: '' })
+        setRegisterSuccess('Registration successful!')
+        setCustomers((prev) => [...prev, data.user])
+        setSelectedCustomer(data.user)
+        setShowRegisterModal(false)
+        setRegisterName('')
+        setRegisterEmail('')
+        setRegisterPhone('')
       }
-    } catch (err) {
-      console.error('Error:', err)
-      setMessage('An error occurred. Please try again.')
+    } catch {
+      setRegisterError('Registration failed')
     } finally {
-      setLoading(false)
+      setRegistering(false)
     }
   }
 
   return (
     <div>
-      {' '}
-      <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
-        <h3 className="mb-6 text-2xl font-bold">Register New Customer</h3>
-        <form onSubmit={handleFormSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium">Name</label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleFormChange}
-              className="w-full rounded border px-3 py-2"
-              required
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Phone Number
+      <div className="flex min-w-[400px] flex-col gap-6 p-6">
+        <h2 className="mb-2 text-center text-xl font-bold">
+          Register/Book Customer
+        </h2>
+        {/* Step 1: Choose purpose */}
+        <div>
+          <label className="mb-2 block font-medium">Choose visit purpose</label>
+          <div className="flex gap-6">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="radio"
+                name="purpose"
+                value="Consultation"
+                checked={purpose === 'Consultation'}
+                onChange={() => setPurpose('Consultation')}
+                className="accent-black"
+              />
+              <span
+                className={`font-semibold ${purpose === 'Consultation' ? 'text-black' : 'text-gray-500'}`}
+              >
+                Consultation
+              </span>
             </label>
-            <input
-              type="tel"
-              name="phone"
-              value={form.phone}
-              onChange={handleFormChange}
-              className="w-full rounded border px-3 py-2"
-              required
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleFormChange}
-              className="w-full rounded border px-3 py-2"
-              required
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">
-              Event for Today
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="radio"
+                name="purpose"
+                value="OTC"
+                checked={purpose === 'OTC'}
+                onChange={() => setPurpose('OTC')}
+                className="accent-black"
+              />
+              <span
+                className={`font-semibold ${purpose === 'OTC' ? 'text-black' : 'text-gray-500'}`}
+              >
+                OTC
+              </span>
             </label>
-            {/* <select
-              name="eventId"
-              value={form.eventId}
-              onChange={handleFormChange}
-              className="w-full rounded border px-3 py-2"
-              required
+          </div>
+        </div>
+        {/* Step 2: Search existing customer */}
+        <div>
+          <label className="mb-2 block font-medium">
+            Search existing customer
+          </label>
+          <div className="relative inline-block w-full">
+            <button
+              onClick={toggleDropdown}
+              className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 px-3 py-2 text-base font-medium text-gray-500 hover:bg-gray-50"
             >
-              <option value="">Select an event</option>
-              {eventsToday.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.title}
-                </option>
-              ))}
-            </select> */}
+              Enter name, email or phone number
+              <svg
+                className={`stroke-current duration-200 ease-in-out ${
+                  isOpen ? 'rotate-180' : ''
+                }`}
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4.79199 7.396L10.0003 12.6043L15.2087 7.396"
+                  stroke=""
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <Dropdown
+              isOpen={isOpen}
+              onClose={closeDropdown}
+              className="absolute right-0 left-0 z-10 mt-1 max-h-60 overflow-y-auto rounded border bg-white shadow-lg"
+            >
+              <div className="border-b px-3 py-2 text-xs font-semibold text-gray-500">
+                Existing patient
+              </div>
+              {filteredCustomers.length === 0 ? (
+                <div className="px-3 py-2 text-gray-400">No results found</div>
+              ) : (
+                filteredCustomers.slice(0, 10).map((c) => (
+                  <DropdownItem
+                    key={c.id}
+                    onClick={() => {
+                      setSelectedCustomer(c)
+                      setSearch(`${c.name} (${c.phone})`)
+                      setDropdownOpen(false)
+                    }}
+                    className="flex cursor-pointer flex-col items-start px-3 py-2 hover:bg-gray-100"
+                  >
+                    <span className="font-medium">{c.name}</span>
+                    <span className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>👤 {c.phone}</span>
+                      <span>📞 {c.email}</span>
+                    </span>
+                  </DropdownItem>
+                ))
+              )}
+            </Dropdown>
           </div>
-          <div className="mt-6 flex justify-end">
+        </div>
+        {/* Divider with OR */}
+        <div className="my-2 flex items-center gap-2">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-xs font-medium text-gray-400">OR</span>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
+        {/* Add new customer button */}
+        <button
+          type="button"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 text-base font-medium hover:bg-gray-50"
+          onClick={() => setShowRegisterModal(true)}
+        >
+          <span className="text-lg">👤</span> Add new customer
+        </button>
+      </div>
+      {/* Register new customer modal */}
+      {showRegisterModal && (
+        <Modal
+          isOpen={showRegisterModal}
+          onClose={() => setShowRegisterModal(false)}
+          className="max-w-[1400px] p-6 lg:p-10"
+        >
+          <h3 className="mb-4 text-center text-lg font-bold">
+            Register new customer
+          </h3>
+          <form onSubmit={handleRegister} className="space-y-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={registerName}
+                onChange={(e) => setRegisterName(e.target.value)}
+                className="w-full rounded border px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Email</label>
+              <input
+                type="email"
+                value={registerEmail}
+                onChange={(e) => setRegisterEmail(e.target.value)}
+                className="w-full rounded border px-3 py-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Phone</label>
+              <input
+                type="tel"
+                value={registerPhone}
+                onChange={(e) => setRegisterPhone(e.target.value)}
+                className="w-full rounded border px-3 py-2"
+                required
+              />
+            </div>
             <button
               type="submit"
-              className="rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
-              disabled={loading}
+              className="w-full rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
+              disabled={registering}
             >
-              {loading ? 'Registering...' : 'Register'}
+              {registering ? 'Registering...' : 'Register'}
             </button>
-          </div>
-        </form>
-      </div>
+            {registerError && (
+              <div className="mt-1 text-xs text-red-600">{registerError}</div>
+            )}
+            {registerSuccess && (
+              <div className="mt-1 text-xs text-green-600">
+                {registerSuccess}
+              </div>
+            )}
+          </form>
+        </Modal>
+      )}
     </div>
   )
 }

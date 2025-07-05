@@ -244,7 +244,7 @@ export const BookingsManagement = ({
       <Modal
         isOpen={isOpen}
         onClose={closeModal}
-        className="max-w-[1400px] p-6 lg:p-10"
+        className="max-w-[600px] p-6 lg:p-10"
       >
         <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
           {/* <CreateServicesForm /> */}
