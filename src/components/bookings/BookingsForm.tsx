@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Modal } from '../ui/modal'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
+import { UserRoundPlus, PhoneCall, Mail } from 'lucide-react'
 
 interface Customer {
   id: string
-  name: string
+  full_name: string
   phone: string
   email: string
   status?: string
@@ -32,21 +33,21 @@ export default function BookingsForm() {
 
   // Fetch customers (simulate API call)
   useEffect(() => {
-    // Replace with your API call
     const fetchCustomers = async () => {
       const res = await fetch('/api/users')
       const data = await res.json()
       setCustomers(data)
     }
+
     fetchCustomers()
   }, [])
 
   // Filtered customers for dropdown
   const filteredCustomers = customers.filter(
     (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase()) ||
-      c.phone.toLowerCase().includes(search.toLowerCase()),
+      (c.name?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (c.email?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (c.phone?.toLowerCase() || '').includes(search.toLowerCase()),
   )
 
   // Open dropdown when input is focused
@@ -186,9 +187,25 @@ export default function BookingsForm() {
               onClose={closeDropdown}
               className="absolute right-0 left-0 z-10 mt-1 max-h-60 overflow-y-auto rounded border bg-white shadow-lg"
             >
+              <input
+                type="text"
+                placeholder="Search by name, email or phone number"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded border px-3 py-2 text-base font-medium text-gray-500"
+              />
               <div className="border-b px-3 py-2 text-xs font-semibold text-gray-500">
                 Existing patient
               </div>
+              {/* <div className="flex justify-between">
+                {customers.map((c) => (
+                  <div key={c.id}>
+                    <span>{c.name}</span>
+                    <span>{c.email}</span>
+                    <span>{c.phone}</span>
+                  </div>
+                ))}
+              </div> */}
               {filteredCustomers.length === 0 ? (
                 <div className="px-3 py-2 text-gray-400">No results found</div>
               ) : (
@@ -197,15 +214,19 @@ export default function BookingsForm() {
                     key={c.id}
                     onClick={() => {
                       setSelectedCustomer(c)
-                      setSearch(`${c.name} (${c.phone})`)
+                      setSearch(`${c.full_name} (${c.phone})`)
                       setDropdownOpen(false)
                     }}
                     className="flex cursor-pointer flex-col items-start px-3 py-2 hover:bg-gray-100"
                   >
-                    <span className="font-medium">{c.name}</span>
+                    <span className="font-medium">{c.full_name}</span>
                     <span className="flex items-center gap-2 text-xs text-gray-500">
-                      <span>👤 {c.phone}</span>
-                      <span>📞 {c.email}</span>
+                      <span className="flex items-center gap-1">
+                        <PhoneCall className="h-3 w-3" /> {c.phone}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-3 w-3" /> {c.email}
+                      </span>
                     </span>
                   </DropdownItem>
                 ))
@@ -225,7 +246,7 @@ export default function BookingsForm() {
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 text-base font-medium hover:bg-gray-50"
           onClick={() => setShowRegisterModal(true)}
         >
-          <span className="text-lg">👤</span> Add new customer
+          <UserRoundPlus className="h-5 w-5" /> Add new customer
         </button>
       </div>
       {/* Register new customer modal */}

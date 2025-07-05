@@ -1,6 +1,6 @@
 'use client'
 import { BookingsManagement } from '@/components/admin/BookingsManagement'
-import EventsToday from '@/components/admin/EventsToday'
+// import EventsToday from '@/components/admin/EventsToday'
 import { EcommerceMetrics } from '@/components/ecommerce/EcommerceMetrics'
 import MonthlySalesChart from '@/components/ecommerce/MonthlySalesChart'
 import MonthlyTarget from '@/components/ecommerce/MonthlyTarget'
@@ -21,9 +21,9 @@ export default function AdminPage() {
           description="Manage your bookings"
         />
       </div>
-      <div className="col-span-12">
+      {/* <div className="col-span-12">
         <EventsToday />
-      </div>
+      </div> */}
     </div>
   )
 }

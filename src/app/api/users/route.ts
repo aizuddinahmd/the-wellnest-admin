@@ -32,3 +32,26 @@ export async function POST(request: Request) {
     )
   }
 }
+
+// GET: Fetch all users
+export async function GET() {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .order('full_name', { ascending: true })
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
+    )
+  }
+}
