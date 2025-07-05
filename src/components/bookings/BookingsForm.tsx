@@ -3,6 +3,7 @@ import { Modal } from '../ui/modal'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import { UserRoundPlus, PhoneCall, Mail } from 'lucide-react'
+import CustomerRegistrationModal from './CustomerRegistrationModal'
 
 interface Customer {
   id: string
@@ -243,7 +244,7 @@ export default function BookingsForm() {
         {/* Add new customer button */}
         <button
           type="button"
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 text-base font-medium hover:bg-gray-50"
+          className="bg-brand-500 hover:bg-brand-500/80 flex w-full items-center justify-center gap-2 rounded-lg border py-2 text-base font-medium text-white"
           onClick={() => setShowRegisterModal(true)}
         >
           <UserRoundPlus className="h-5 w-5" /> Add new customer
@@ -254,60 +255,15 @@ export default function BookingsForm() {
         <Modal
           isOpen={showRegisterModal}
           onClose={() => setShowRegisterModal(false)}
-          className="max-w-[1400px] p-6 lg:p-10"
+          className="max-w-[1200px] p-6 lg:p-10"
         >
-          <h3 className="mb-4 text-center text-lg font-bold">
-            Register new customer
-          </h3>
-          <form onSubmit={handleRegister} className="space-y-3">
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={registerName}
-                onChange={(e) => setRegisterName(e.target.value)}
-                className="w-full rounded border px-3 py-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Email</label>
-              <input
-                type="email"
-                value={registerEmail}
-                onChange={(e) => setRegisterEmail(e.target.value)}
-                className="w-full rounded border px-3 py-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Phone</label>
-              <input
-                type="tel"
-                value={registerPhone}
-                onChange={(e) => setRegisterPhone(e.target.value)}
-                className="w-full rounded border px-3 py-2"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full rounded-md bg-[#355c4a] px-4 py-2 text-white hover:bg-[#355c4a]/80"
-              disabled={registering}
-            >
-              {registering ? 'Registering...' : 'Register'}
-            </button>
-            {registerError && (
-              <div className="mt-1 text-xs text-red-600">{registerError}</div>
-            )}
-            {registerSuccess && (
-              <div className="mt-1 text-xs text-green-600">
-                {registerSuccess}
-              </div>
-            )}
-          </form>
+          <div className="flex flex-col gap-6">
+            <CustomerRegistrationModal
+              isOpen={showRegisterModal}
+              onClose={() => setShowRegisterModal(false)}
+              onNext={() => setShowRegisterModal(false)}
+            />
+          </div>
         </Modal>
       )}
     </div>
