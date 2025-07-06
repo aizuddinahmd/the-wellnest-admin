@@ -14,7 +14,7 @@ import Badge from '../ui/badge/Badge'
 import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import SpinnerTwo from '../ui/spinners/SpinnerTwo'
-import BookingsForm from '../bookings/BookingsForm'
+import CreateBookingsForm from '../bookings/CreateBookingsForm'
 
 interface Booking {
   id: string
@@ -247,8 +247,7 @@ export const BookingsManagement = ({
         className="max-w-[600px] p-6 lg:p-10"
       >
         <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
-          {/* <CreateServicesForm /> */}
-          <BookingsForm />
+          <CreateBookingsForm />
         </div>
       </Modal>
     </>
