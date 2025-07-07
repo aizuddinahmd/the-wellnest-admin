@@ -15,42 +15,16 @@ import { Dropdown } from '../ui/dropdown/Dropdown'
 import { DropdownItem } from '../ui/dropdown/DropdownItem'
 import SpinnerTwo from '../ui/spinners/SpinnerTwo'
 import CreateBookingsForm from '../bookings/CreateBookingsForm'
-
-interface Booking {
-  id: string
-  user: {
-    full_name: string
-    email: string
-  }
-  event: {
-    title: string
-    start_time: string
-  }
-  staff: {
-    full_name: string
-  }
-  notes: string
-  status: string
-  created_at: string
-  updated_at: string
-}
-
-function isToday(dateStr: string) {
-  const d = new Date(dateStr)
-  const today = new Date()
-  return (
-    d.getFullYear() === today.getFullYear() &&
-    d.getMonth() === today.getMonth() &&
-    d.getDate() === today.getDate()
-  )
-}
+import { Booking } from '@/types'
 
 export const BookingsManagement = ({
   title,
   description,
+  bookingsData,
 }: {
   title: string
   description: string
+  bookingsData: Booking[]
 }) => {
   // const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -59,30 +33,30 @@ export const BookingsManagement = ({
   const { isOpen, openModal, closeModal } = useModal()
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch('/api/bookings')
-        const data = await res.json()
-        if (Array.isArray(data)) {
-          const filtered = data.filter(
-            (b: Booking) =>
-              b.event && b.event.start_time && isToday(b.event.start_time),
-          )
-          setBookings(filtered)
-        } else {
-          setError('Failed to fetch bookings')
-        }
-      } catch {
-        setError('Failed to fetch bookings')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchBookings()
-  }, [])
+  // useEffect(() => {
+  //   const fetchBookings = async () => {
+  //     setLoading(true)
+  //     setError(null)
+  //     try {
+  //       const res = await fetch('/api/bookings')
+  //       const data = await res.json()
+  //       if (Array.isArray(data)) {
+  //         const filtered = data.filter(
+  //           (b: Booking) =>
+  //             b.event && b.event.start_time && isToday(b.event.start_time),
+  //         )
+  //         setBookings(filtered)
+  //       } else {
+  //         setError('Failed to fetch bookings')
+  //       }
+  //     } catch {
+  //       setError('Failed to fetch bookings')
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+  //   fetchBookings()
+  // }, [])
 
   // const handleClassCreate = (e: React.FormEvent) => {
   // 	e.preventDefault()
@@ -90,6 +64,11 @@ export const BookingsManagement = ({
   // 	console.log('Create class:', newClassName, 'for', modalCategory)
   // 	handleCloseModal()
   // }
+  useEffect(() => {
+    setBookings(bookingsData)
+    setLoading(false)
+    setError(null)
+  }, [bookingsData])
 
   // Dropdown action handlers
   const handleEdit = (booking: Booking) => {
@@ -251,7 +230,7 @@ export const BookingsManagement = ({
         )}
         {bookings.length === 0 && !loading && (
           <div className="py-8 text-center text-gray-500">
-            No bookings found.
+            No bookings for today.
           </div>
         )}
       </div>
