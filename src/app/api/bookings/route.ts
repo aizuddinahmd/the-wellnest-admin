@@ -146,7 +146,7 @@ export async function GET() {
         `
 				*,
 				user:users (full_name, email),
-				event:events (title),
+				event:events (title, start_time),
 				staff:staff (full_name)
 			`,
       )

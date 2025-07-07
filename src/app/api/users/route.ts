@@ -11,9 +11,20 @@ export async function POST(request: Request) {
       .from('users')
       .insert([
         {
-          name: body.name,
+          full_name: body.full_name,
           email: body.email,
           phone: body.phone,
+          date_of_birth: body.date_of_birth,
+          gender: body.gender,
+          nationality: body.nationality,
+          race: body.race,
+          religion: body.religion,
+          address: body.address,
+          city: body.city,
+          postcode: body.postcode,
+          country: body.country,
+          nric: body.nric,
+          image: body.image,
         },
       ])
       .select()

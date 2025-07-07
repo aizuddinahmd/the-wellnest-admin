@@ -2,13 +2,13 @@ import React, { useRef, useState } from 'react'
 import ComponentCard from '../common/ComponentCard'
 import Label from '../form/Label'
 import Input from '../form/input/InputField'
-// import Select from '../form/Select'
-// import { ChevronDownIcon } from 'lucide-react'
 import { ChevronDownIcon, EnvelopeIcon } from '../../icons'
 import { useDropzone } from 'react-dropzone'
 import PhoneInput from '../form/group-input/PhoneInput'
 import DatePicker from '@/components/form/date-picker'
 import Select from '../form/Select'
+import Button from '../ui/button/Button'
+import { UserRoundPlus } from 'lucide-react'
 
 export default function CustomerRegistrationModal() {
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -354,12 +354,13 @@ export default function CustomerRegistrationModal() {
         </div>
       </div>
       <div className="flex justify-end">
-        <button
-          type="submit"
-          className="bg-brand-500 hover:bg-brand-500/80 flex w-full items-center justify-center gap-2 rounded-lg border py-2 text-base font-medium text-white"
+        <Button
+          className="w-full"
+          size="sm"
+          endIcon={<UserRoundPlus className="h-3 w-3" />}
         >
           Register
-        </button>
+        </Button>
       </div>
     </form>
   )

@@ -8,6 +8,7 @@ import ComponentCard from '../common/ComponentCard'
 import Label from '../form/Label'
 import Input from '../form/input/InputField'
 import Radio from '../form/input/Radio'
+import Button from '../ui/button/Button'
 // import RadioGroupItem from '../form/input/RadioItem'
 
 interface Customer {
@@ -230,13 +231,13 @@ export default function CreateBookingsForm() {
                 <div className="h-px flex-1 bg-gray-200" />
               </div>
               {/* Add new customer button */}
-              <button
-                type="button"
-                className="bg-brand-500 hover:bg-brand-500/80 flex w-full items-center justify-center gap-2 rounded-lg border py-2 text-base font-medium text-white"
+              <Button
+                className="w-full"
+                size="sm"
                 onClick={() => setShowRegisterModal(true)}
               >
-                <UserRoundPlus className="h-5 w-5" /> Add new customer
-              </button>
+                Add new customer <UserRoundPlus className="h-3 w-3" />
+              </Button>
             </div>
             {/* Register new customer modal */}
             {showRegisterModal && (

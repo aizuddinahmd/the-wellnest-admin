@@ -24,6 +24,7 @@ interface Booking {
   }
   event: {
     title: string
+    start_time: string
   }
   staff: {
     full_name: string
@@ -32,6 +33,16 @@ interface Booking {
   status: string
   created_at: string
   updated_at: string
+}
+
+function isToday(dateStr: string) {
+  const d = new Date(dateStr)
+  const today = new Date()
+  return (
+    d.getFullYear() === today.getFullYear() &&
+    d.getMonth() === today.getMonth() &&
+    d.getDate() === today.getDate()
+  )
 }
 
 export const BookingsManagement = ({
@@ -55,14 +66,17 @@ export const BookingsManagement = ({
       try {
         const res = await fetch('/api/bookings')
         const data = await res.json()
-        console.log(data)
         if (Array.isArray(data)) {
-          setBookings(data)
+          const filtered = data.filter(
+            (b: Booking) =>
+              b.event && b.event.start_time && isToday(b.event.start_time),
+          )
+          setBookings(filtered)
         } else {
-          setError('Failed to fetch courses')
+          setError('Failed to fetch bookings')
         }
       } catch {
-        setError('Failed to fetch courses')
+        setError('Failed to fetch bookings')
       } finally {
         setLoading(false)
       }
@@ -80,17 +94,17 @@ export const BookingsManagement = ({
   // Dropdown action handlers
   const handleEdit = (booking: Booking) => {
     // TODO: Open edit modal with service data
-    alert(`Edit service: ${service.name}`)
+    alert(`Edit service: ${booking.event.title}`)
     setOpenDropdownId(null)
   }
-  const handleDeactivate = (service: Service) => {
+  const handleDeactivate = (booking: Booking) => {
     // TODO: Implement deactivate logic
-    alert(`Deactivate service: ${service.name}`)
+    alert(`Deactivate booking: ${booking.event.title}`)
     setOpenDropdownId(null)
   }
-  const handleDelete = (service: Service) => {
+  const handleDelete = (booking: Booking) => {
     // TODO: Implement delete logic
-    alert(`Delete service: ${service.name}`)
+    alert(`Delete booking: ${booking.event.title}`)
     setOpenDropdownId(null)
   }
 
@@ -180,10 +194,10 @@ export const BookingsManagement = ({
                   </span>
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                  {booking.event.title}
+                  {booking.event.start_time}
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                  {booking.status}
+                  {booking.event.title}
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                   {booking.notes}
