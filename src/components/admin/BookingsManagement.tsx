@@ -74,24 +74,10 @@ export const BookingsManagement = ({
     bookingType: 'one-off', // or 'package', 'membership'
     // add other fields as needed
   })
-  // const [name, setName] = useState('')
-  // const [nric, setNric] = useState('')
-  // const [phone, setPhone] = useState('')
-  // const [email, setEmail] = useState('')
-  // const [dob, setDob] = useState('')
-  // const [gender, setGender] = useState('')
-  // const [nationality, setNationality] = useState('')
-  // const [race, setRace] = useState('')
-  // const [religion, setReligion] = useState('')
-  // const [address, setAddress] = useState('')
-  // const [state, setState] = useState('')
-  // const [city, setCity] = useState('')
-  // const [postcode, setPostcode] = useState('')
-  // const [country, setCountry] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [step, setStep] = useState<'form' | 'summary'>('form')
-  const [personalDetails, setPersonalDetails] = useState<User | null>(null)
-  const [purpose, setPurpose] = useState<'Consultation' | 'OTC'>('Consultation')
+  // const [personalDetails, setPersonalDetails] = useState<User | null>(null)
+  // const [purpose, setPurpose] = useState<'Consultation' | 'OTC'>('Consultation')
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [customers, setCustomers] = useState<User[]>([])
@@ -338,20 +324,20 @@ export const BookingsManagement = ({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            full_name: personalDetails?.full_name,
-            nric: personalDetails?.nric,
-            phone: personalDetails?.phone,
-            email: personalDetails?.email,
-            dob: personalDetails?.dob,
-            gender: personalDetails?.gender,
-            nationality: personalDetails?.nationality,
-            race: personalDetails?.race,
-            religion: personalDetails?.religion,
-            address: personalDetails?.address,
-            state: personalDetails?.state,
-            city: personalDetails?.city,
-            postcode: personalDetails?.postcode,
-            country: personalDetails?.country,
+            full_name: form.name,
+            nric: form.nric,
+            phone: form.phone,
+            email: form.email,
+            dob: form.dob,
+            gender: form.gender,
+            nationality: form.nationality,
+            race: form.race,
+            religion: form.religion,
+            address: form.address,
+            state: form.state,
+            city: form.city,
+            postcode: form.postcode,
+            country: form.country,
           }),
         })
         const userData = await userRes.json()
@@ -367,6 +353,7 @@ export const BookingsManagement = ({
         body: JSON.stringify({
           user_id: userId,
           event_id: selectedEvent?.id,
+
           // add other booking fields as needed
         }),
       })

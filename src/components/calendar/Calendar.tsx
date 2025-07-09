@@ -97,14 +97,16 @@ const Calendar: React.FC = () => {
       const formattedEvents = data.map((event: Event) => ({
         ...event,
         id: event.id,
-        title: event.title,
+        title: event.service_name,
+        service_id: event.service_id,
+        service_price: event.service_price,
         start: event.start_time, // must be ISO string
         end: event.end_time, // must be ISO string
         allDay: false,
         extendedProps: {
           calendar: event.color,
-          instructor: event.instructor,
-          classPax: event.class_pax,
+          instructor: event.staff_id,
+          classPax: event.capacity,
           waitlist: event.waitlist,
           repeat: event.repeat,
           repeatDays: event.repeat_days,

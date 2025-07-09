@@ -19,15 +19,20 @@ export interface Booking {
 
 export interface Event {
   id: string
-  title: string
+  service_id: string
+  service_name: string
+  service_price: number
   start_time: string
   end_time: string
   color: string
-  instructor: string
-  class_pax: number
+  staff_id: string
+  capacity: number
   waitlist: number
-  repeat: string
+  repeat: boolean
   repeat_days: number[]
+  created_at: string
+  updated_at: string
+  deleted_at: string
 }
 
 export interface User {
