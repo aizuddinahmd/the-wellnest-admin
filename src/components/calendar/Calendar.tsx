@@ -16,24 +16,12 @@ import { useModal } from '@/hooks/useModal'
 import { Modal } from '@/components/ui/modal'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { Event } from '@/types'
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
     calendar: string
   }
-}
-
-interface Event {
-  id: string
-  title: string
-  start_time: string
-  end_time: string
-  color: string
-  instructor: string
-  class_pax: number
-  waitlist: number
-  repeat: string
-  repeat_days: number[]
 }
 
 const Calendar: React.FC = () => {

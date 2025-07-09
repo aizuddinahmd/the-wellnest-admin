@@ -8,7 +8,7 @@ import PhoneInput from '../form/group-input/PhoneInput'
 import DatePicker from '@/components/form/date-picker'
 import Select from '../form/Select'
 import Button from '../ui/button/Button'
-import { UserRoundPlus } from 'lucide-react'
+// import { UserRoundPlus } from 'lucide-react'
 import Image from 'next/image'
 import Radio from '../form/input/Radio'
 
@@ -192,60 +192,64 @@ export default function CustomerRegistrationModal() {
                       }}
                     />
                   </div>
-                  <div>
-                    <Label>Gender</Label>
-                    <div className="relative">
-                      <Select
-                        options={genderOptions}
-                        placeholder="Select an option"
-                        onChange={handleGenderChange}
-                        className="dark:bg-dark-900"
-                      />
-                      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                        <ChevronDownIcon />
-                      </span>
+                  <div className="flex flex-row gap-6">
+                    <div>
+                      <Label>Gender</Label>
+                      <div className="relative">
+                        <Select
+                          options={genderOptions}
+                          placeholder="Select an option"
+                          onChange={handleGenderChange}
+                          className="dark:bg-dark-900"
+                        />
+                        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                          <ChevronDownIcon />
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Nationality</Label>
+                      <div className="relative">
+                        <Select
+                          options={nationalityOptions}
+                          placeholder="Select an option"
+                          onChange={handleNationalityChange}
+                          className="dark:bg-dark-900"
+                        />
+                        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                          <ChevronDownIcon />
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <Label>Nationality</Label>
-                    <div className="relative">
-                      <Select
-                        options={nationalityOptions}
-                        placeholder="Select an option"
-                        onChange={handleNationalityChange}
-                        className="dark:bg-dark-900"
-                      />
-                      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                        <ChevronDownIcon />
-                      </span>
+                  <div className="flex flex-row gap-6">
+                    <div>
+                      <Label>Race</Label>
+                      <div className="relative">
+                        <Select
+                          options={raceOptions}
+                          placeholder="Select an option"
+                          onChange={handleRaceChange}
+                          className="dark:bg-dark-900"
+                        />
+                        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                          <ChevronDownIcon />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <Label>Race</Label>
-                    <div className="relative">
-                      <Select
-                        options={raceOptions}
-                        placeholder="Select an option"
-                        onChange={handleRaceChange}
-                        className="dark:bg-dark-900"
-                      />
-                      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                        <ChevronDownIcon />
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Religion</Label>
-                    <div className="relative">
-                      <Select
-                        options={religionOptions}
-                        placeholder="Select an option"
-                        onChange={handleReligionChange}
-                        className="dark:bg-dark-900"
-                      />
-                      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                        <ChevronDownIcon />
-                      </span>
+                    <div>
+                      <Label>Religion</Label>
+                      <div className="relative">
+                        <Select
+                          options={religionOptions}
+                          placeholder="Select an option"
+                          onChange={handleReligionChange}
+                          className="dark:bg-dark-900"
+                        />
+                        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                          <ChevronDownIcon />
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -364,7 +368,11 @@ export default function CustomerRegistrationModal() {
             </div>
           </div>
           <div className="flex justify-end">
-            <Button className="w-full cursor-pointer" size="sm" type="submit">
+            <Button
+              className="w-full cursor-pointer"
+              size="sm"
+              onClick={handleNext}
+            >
               Next
             </Button>
           </div>
@@ -444,11 +452,7 @@ export default function CustomerRegistrationModal() {
             <div className="space-y-6">
               <div>
                 <Label>Booking Event</Label>
-                <Input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
+                <Input type="text" value={eventTitle} onChange={(e) => {}} />
               </div>
             </div>
             <div className="flex flex-row gap-2">

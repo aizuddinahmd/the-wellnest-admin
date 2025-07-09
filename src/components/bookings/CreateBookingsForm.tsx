@@ -9,25 +9,24 @@ import Label from '../form/Label'
 import Input from '../form/input/InputField'
 import Radio from '../form/input/Radio'
 import Button from '../ui/button/Button'
+import { User } from '@/types'
 // import RadioGroupItem from '../form/input/RadioItem'
 
-interface Customer {
-  id: string
-  full_name: string
-  phone: string
-  email: string
-  status?: string
-  registrationDate?: string
-}
+// interface Customer {
+//   id: string
+//   full_name: string
+//   phone: string
+//   email: string
+//   status?: string
+//   registrationDate?: string
+// }
 
 export default function CreateBookingsForm() {
   const [purpose, setPurpose] = useState<'Consultation' | 'OTC'>('Consultation')
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null,
-  )
+  const [customers, setCustomers] = useState<User[]>([])
+  const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [registerName, setRegisterName] = useState('')
   const [registerEmail, setRegisterEmail] = useState('')
@@ -57,7 +56,7 @@ export default function CreateBookingsForm() {
   // Filtered customers for dropdown
   const filteredCustomers = customers.filter(
     (c) =>
-      (c.name?.toLowerCase() || '').includes(search.toLowerCase()) ||
+      (c.full_name?.toLowerCase() || '').includes(search.toLowerCase()) ||
       (c.email?.toLowerCase() || '').includes(search.toLowerCase()) ||
       (c.phone?.toLowerCase() || '').includes(search.toLowerCase()),
   )

@@ -2,12 +2,17 @@
 import React from 'react'
 import Badge from '../ui/badge/Badge'
 import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, GroupIcon } from '@/icons'
-import { Booking } from '@/types'
+import { Booking, Event, User } from '@/types'
+import { BanknoteIcon } from 'lucide-react'
 
 export const EcommerceMetrics = ({
   bookingsData,
+  eventsData,
+  customersData,
 }: {
   bookingsData: Booking[]
+  eventsData: Event[]
+  customersData: User[]
 }) => {
   const bookingsLength = bookingsData.length
 
@@ -47,7 +52,7 @@ export const EcommerceMetrics = ({
               Active Classes
             </span>
             <h4 className="text-title-sm mt-2 font-bold text-gray-800 dark:text-white/90">
-              5,359
+              {eventsData.length}
             </h4>
           </div>
 
@@ -59,7 +64,7 @@ export const EcommerceMetrics = ({
       </div>
       <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-          <BoxIconLine className="text-gray-800 dark:text-white/90" />
+          <BanknoteIcon className="text-gray-800 dark:text-white/90" />
         </div>
         <div className="mt-5 flex items-end justify-between">
           <div>
