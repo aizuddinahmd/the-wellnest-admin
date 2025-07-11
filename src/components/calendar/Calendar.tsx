@@ -4,7 +4,6 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
-
 import { Search, CalendarIcon, Clock, ChevronDown } from 'lucide-react'
 import {
   EventInput,
@@ -48,9 +47,15 @@ const Calendar: React.FC = () => {
     new Date(new Date().setHours(8, 0, 0, 0)),
   )
   const [serviceOptions, setServiceOptions] = useState<
-    { name: string; duration_minutes: number }[]
+    {
+      service_id: string
+      name: string
+      duration_minutes: number
+      base_price: number
+    }[]
   >([])
   const [duration, setDuration] = useState(0)
+  const [serviceId, setServiceId] = useState<string | null>(null)
 
   const weekLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
@@ -75,6 +80,8 @@ const Calendar: React.FC = () => {
             data.map((service) => ({
               name: service.name,
               duration_minutes: service.duration_minutes,
+              service_id: service.id,
+              base_price: service.base_price,
             })),
           )
         }
@@ -170,6 +177,7 @@ const Calendar: React.FC = () => {
 
     const eventData = {
       title: eventTitle,
+      service_id: serviceId,
       start_time: eventStart ? eventStart.toISOString() : null,
       end_time: eventEnd ? eventEnd.toISOString() : null,
       // instructor,
@@ -179,6 +187,7 @@ const Calendar: React.FC = () => {
       repeat,
       repeat_days: weeklyDays,
     }
+    console.log('eventData:', eventData)
 
     // Save to database
     try {
@@ -272,12 +281,20 @@ const Calendar: React.FC = () => {
             <div className="relative">
               <select
                 className="w-full rounded-lg border px-4 py-2 pr-10 text-base"
-                value={eventTitle}
-                onChange={(e) => setEventTitle(e.target.value)}
+                value={serviceId || ''}
+                onChange={(e) => {
+                  setServiceId(e.target.value)
+                  // Optionally, set the event title for display or other logic
+                  const selected = serviceOptions.find(
+                    (s) => s.service_id === e.target.value,
+                  )
+                  setEventTitle(selected ? selected.name : '')
+                  setDuration(selected ? selected.duration_minutes : 0)
+                }}
               >
                 <option value="">Select a class</option>
                 {serviceOptions.map((service) => (
-                  <option key={service.name} value={service.name}>
+                  <option key={service.service_id} value={service.service_id}>
                     {service.name}
                   </option>
                 ))}
@@ -606,10 +623,10 @@ const Calendar: React.FC = () => {
 }
 
 const renderEventContent = (eventInfo: EventContentArg) => {
-  const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`
+  // const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`
   return (
     <div
-      className={`event-fc-color fc-event-main flex ${colorClass} rounded-sm p-1`}
+    // className={`event-fc-color fc-event-main flex ${colorClass} rounded-sm p-1`}
     >
       <div className="fc-daygrid-event-dot"></div>
       <div className="fc-event-time">{eventInfo.timeText}</div>

@@ -12,14 +12,17 @@ export async function POST(request: Request) {
       .insert([
         {
           title: body.title,
+          service_id: body.service_id,
+          // service_name: body.service_name,
+          // service_price: body.service_price,
           start_time: body.start_time,
           end_time: body.end_time,
           // instructor: body.instructor,
           capacity: body.capacity,
-          waitlist: body.waitlist,
-          color: body.color,
-          repeat: body.repeat,
-          repeat_days: body.repeat_days,
+          // waitlist: body.waitlist,
+          // color: body.color,
+          // repeat: body.repeat,
+          // repeat_days: body.repeat_days,
         },
       ])
       .select()
@@ -29,6 +32,8 @@ export async function POST(request: Request) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error }, { status: 400 })
     }
+
+    console.log('Event created:', data)
 
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
