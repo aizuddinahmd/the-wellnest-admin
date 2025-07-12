@@ -4,37 +4,37 @@ import { createClient } from '@/utils/supabase/server'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-
     const supabase = await createClient()
+
+    // Support both single object and array of objects
+    const events = Array.isArray(body) ? body : [body]
+
+    // Map to ensure all required fields are present
+    const eventsToInsert = events.map((event) => ({
+      title: event.title,
+      service_id: event.service_id || null,
+      start_time: event.start_time,
+      end_time: event.end_time,
+      capacity: event.capacity,
+      waitlist: event.waitlist,
+      color: event.color,
+      repeat: event.repeat,
+      repeat_days: event.repeat_days,
+      staff_id: event.staff_id || null,
+      // add any other required fields here
+    }))
 
     const { data, error } = await supabase
       .from('events')
-      .insert([
-        {
-          title: body.title,
-          service_id: body.service_id,
-          // service_name: body.service_name,
-          // service_price: body.service_price,
-          start_time: body.start_time,
-          end_time: body.end_time,
-          // instructor: body.instructor,
-          capacity: body.capacity,
-          // waitlist: body.waitlist,
-          // color: body.color,
-          // repeat: body.repeat,
-          // repeat_days: body.repeat_days,
-        },
-      ])
+      .insert(eventsToInsert)
       .select()
-      .single()
 
     if (error) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error }, { status: 400 })
     }
 
-    console.log('Event created:', data)
-
+    console.log('Event(s) created:', data)
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
     console.error('Error creating event:', error)

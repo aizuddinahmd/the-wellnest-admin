@@ -19,6 +19,7 @@ export interface Booking {
 
 export interface Event {
   id: string
+  title: string
   service_id: string
   service_name: string
   service_price: number

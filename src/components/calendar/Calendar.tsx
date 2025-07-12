@@ -16,11 +16,20 @@ import { Modal } from '@/components/ui/modal'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { Event } from '@/types'
+import { toast } from 'sonner'
+import Radio from '../form/input/Radio'
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
     calendar: string
   }
+}
+
+type Appointment = {
+  date: string
+  start_datetime: string
+  end_datetime: string
+  day_of_week: number
 }
 
 const Calendar: React.FC = () => {
@@ -104,7 +113,7 @@ const Calendar: React.FC = () => {
       const formattedEvents = data.map((event: Event) => ({
         ...event,
         id: event.id,
-        title: event.service_name,
+        title: event.title,
         service_id: event.service_id,
         service_price: event.service_price,
         start: event.start_time, // must be ISO string
@@ -145,6 +154,44 @@ const Calendar: React.FC = () => {
     setEventEndDate(selectInfo.endStr ? new Date(selectInfo.endStr) : null)
     openModal()
   }
+  const generateAppointmentsForWeek = (): Appointment[] => {
+    if (
+      !eventStartDate ||
+      !startTime ||
+      repeat !== 'weekly' ||
+      weeklyDays.length === 0
+    ) {
+      return []
+    }
+
+    // Get the base date (start of the week, or the selected date)
+    const baseDate = new Date(eventStartDate)
+    const startHour = startTime.getHours()
+    const startMinute = startTime.getMinutes()
+
+    return weeklyDays.map((dayIndex) => {
+      // Clone base date and set to the correct weekday
+      const date = new Date(baseDate)
+      const currentDay = date.getDay()
+      const diff = (dayIndex - currentDay + 7) % 7
+      date.setDate(date.getDate() + diff)
+
+      // Set start time
+      const appointmentStart = new Date(date)
+      appointmentStart.setHours(startHour, startMinute, 0, 0)
+
+      // Set end time using duration
+      const appointmentEnd = new Date(appointmentStart)
+      appointmentEnd.setMinutes(appointmentEnd.getMinutes() + duration)
+
+      return {
+        date: date.toISOString().split('T')[0],
+        start_datetime: appointmentStart.toISOString(),
+        end_datetime: appointmentEnd.toISOString(),
+        day_of_week: dayIndex,
+      }
+    })
+  }
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     setSelectedEvent(clickInfo.event as unknown as CalendarEvent)
@@ -172,51 +219,81 @@ const Calendar: React.FC = () => {
   }
 
   const handleAddOrUpdateEvent = async () => {
-    const eventStart = getCombinedDateTime()
-    const eventEnd = getEndTime()
-
-    const eventData = {
-      title: eventTitle,
-      service_id: serviceId,
-      start_time: eventStart ? eventStart.toISOString() : null,
-      end_time: eventEnd ? eventEnd.toISOString() : null,
-      // instructor,
-      capacity: classPax,
-      waitlist,
-      color: eventLevel,
-      repeat,
-      repeat_days: weeklyDays,
+    if (repeat === 'weekly' && weeklyDays.length > 0) {
+      // Generate all appointments for the selected week days
+      const appointments = generateAppointmentsForWeek().map((appt) => ({
+        title: eventTitle || 'Untitled Event',
+        service_id: serviceId,
+        start_time: appt.start_datetime,
+        end_time: appt.end_datetime,
+        capacity: classPax,
+        waitlist,
+        color: eventLevel,
+        repeat,
+        repeat_days: weeklyDays,
+        staff_id: instructor,
+        // add any other required fields here
+      }))
+      console.log('appointments:', appointments)
+      // Send all appointments to your backend
+      try {
+        const response = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(appointments),
+        })
+        if (!response.ok) throw new Error('Failed to save appointments')
+        toast.success('Appointments saved successfully')
+        // Optionally, update your local state with the new events
+        // setEvents([...events, ...appointments])
+      } catch (err) {
+        toast.error('Failed to save appointments')
+        console.error(err)
+      }
+    } else {
+      // Single event logic (as you already have)
+      const eventStart = getCombinedDateTime()
+      const eventEnd = getEndTime()
+      const eventData = {
+        title: eventTitle,
+        service_id: serviceId,
+        start_time: eventStart ? eventStart.toISOString() : null,
+        end_time: eventEnd ? eventEnd.toISOString() : null,
+        capacity: classPax,
+        waitlist,
+        color: eventLevel,
+        repeat,
+        repeat_days: weeklyDays,
+      }
+      try {
+        const response = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData),
+        })
+        if (!response.ok) throw new Error('Failed to save event')
+        const savedEvent = await response.json()
+        setEvents((prev) => [
+          ...prev,
+          {
+            ...savedEvent,
+            start: savedEvent.start_time,
+            end: savedEvent.end_time,
+            allDay: false,
+            extendedProps: { calendar: savedEvent.color },
+          },
+        ])
+        toast.success('Event saved successfully')
+      } catch (err) {
+        toast.error('Failed to save event')
+        console.error(err)
+      }
     }
-    console.log('eventData:', eventData)
-
-    // Save to database
-    try {
-      const response = await fetch('/api/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData),
-      })
-      if (!response.ok) throw new Error('Failed to save event')
-      const savedEvent = await response.json()
-
-      // Optionally, add the saved event to your local state
-      setEvents((prev) => [
-        ...prev,
-        {
-          ...savedEvent,
-          start: savedEvent.start_time,
-          end: savedEvent.end_time,
-          allDay: false,
-          extendedProps: { calendar: savedEvent.color },
-        },
-      ])
-    } catch (err) {
-      // Handle error (show toast, etc)
-      console.error(err)
-    }
-
     closeModal()
     resetModalFields()
+  }
+  const handleRadioChange = (value: string) => {
+    setRepeat(value as 'none' | 'daily' | 'weekly')
   }
 
   const resetModalFields = () => {
@@ -419,33 +496,30 @@ const Calendar: React.FC = () => {
           <div className="mb-4">
             <label className="mb-1 block font-semibold">Repeat rules</label>
             <div className="mt-2 flex flex-col gap-2">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="repeat"
-                  checked={repeat === 'none'}
-                  onChange={() => setRepeat('none')}
-                />
-                Doesn&apos;t repeat
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="repeat"
-                  checked={repeat === 'daily'}
-                  onChange={() => setRepeat('daily')}
-                />
-                Daily
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="repeat"
-                  checked={repeat === 'weekly'}
-                  onChange={() => setRepeat('weekly')}
-                />
-                Weekly
-              </label>
+              <Radio
+                id="repeat-none"
+                name="repeat"
+                value="none"
+                checked={repeat === 'none'}
+                onChange={handleRadioChange}
+                label="Doesn't repeat"
+              />
+              <Radio
+                id="repeat-daily"
+                name="repeat"
+                value="daily"
+                checked={repeat === 'daily'}
+                onChange={handleRadioChange}
+                label="Daily"
+              />
+              <Radio
+                id="repeat-weekly"
+                name="repeat"
+                value="weekly"
+                checked={repeat === 'weekly'}
+                onChange={handleRadioChange}
+                label="Weekly"
+              />
               {/* Daily time picker */}
               {repeat === 'daily' && (
                 <div className="mt-4">
@@ -623,14 +697,18 @@ const Calendar: React.FC = () => {
 }
 
 const renderEventContent = (eventInfo: EventContentArg) => {
-  // const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar.toLowerCase()}`
+  const color = eventInfo.event.extendedProps.calendar || 'default'
+  const colorClass = `fc-bg-${color.toLowerCase()}`
   return (
     <div
-    // className={`event-fc-color fc-event-main flex ${colorClass} rounded-sm p-1`}
+      className={`event-fc-color fc-event-main flex ${colorClass} flex-col rounded-sm p-1`}
     >
       <div className="fc-daygrid-event-dot"></div>
       <div className="fc-event-time">{eventInfo.timeText}</div>
       <div className="fc-event-title">{eventInfo.event.title}</div>
+      <div className="fc-event-price">
+        {eventInfo.event.extendedProps.classPax} pax
+      </div>
     </div>
   )
 }
