@@ -23,7 +23,7 @@ export async function POST(request: Request) {
           city: body.city,
           postcode: body.postcode,
           country: body.country,
-          nric: body.nric,
+          // nric: body.nric,
           image: body.image,
         },
       ])
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
       .single()
 
     if (error) {
+      console.error('Error creating user:', error)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 

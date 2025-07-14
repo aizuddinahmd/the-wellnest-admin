@@ -33,7 +33,8 @@ import { useDropzone } from 'react-dropzone'
 import { ChevronDownIcon, EnvelopeIcon } from '../../icons'
 import Image from 'next/image'
 import Radio from '../form/input/Radio'
-import CustomerRegistrationModal from '../bookings/CustomerRegistrationModal'
+// import CustomerRegistrationModal from '../bookings/CustomerRegistrationModal'
+import { toast } from 'sonner'
 
 export const BookingsManagement = ({
   title,
@@ -92,6 +93,7 @@ export const BookingsManagement = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const [selectedValue, setSelectedValue] = useState<string>('Consultation')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
@@ -152,6 +154,7 @@ export const BookingsManagement = ({
   }
   const handleEventChange = (event: Event) => {
     setSelectedEvent(event)
+    setIsEventDropdownOpen(false)
   }
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -311,7 +314,7 @@ export const BookingsManagement = ({
   //   }
   // }
 
-  const handleBookingRegister = async () => {
+  const handleBookingRegister = async (selectedEvent: Event) => {
     setRegistering(true)
     setRegisterError(null)
     setRegisterSuccess(null)
@@ -341,8 +344,11 @@ export const BookingsManagement = ({
           }),
         })
         const userData = await userRes.json()
-        if (!userRes.ok)
+        if (!userRes.ok) {
+          toast.error(userData.error || 'User registration failed')
           throw new Error(userData.error || 'User creation failed')
+        }
+        toast.success('User registered successfully!')
         userId = userData.id
       }
 
@@ -352,15 +358,20 @@ export const BookingsManagement = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
-          event_id: selectedEvent?.id,
-
-          // add other booking fields as needed
+          event_id: selectedEvent.id,
+          staff_id: selectedEvent.staff_id || null,
+          status: 'pending',
+          booking_time: new Date().toISOString(),
+          attended: false,
+          notes: '',
         }),
       })
       const bookingData = await bookingRes.json()
-      if (!bookingRes.ok) throw new Error(bookingData.error || 'Booking failed')
-
-      setRegisterSuccess('Booking successful!')
+      if (!bookingRes.ok) {
+        toast.error(bookingData.error || 'Booking failed')
+        throw new Error(bookingData.error || 'Booking failed')
+      }
+      toast.success('Booking successful!')
       // Optionally, refresh bookings list here
       closeModal()
     } catch (error) {
@@ -1051,14 +1062,20 @@ export const BookingsManagement = ({
                                       <Label>Event</Label>
                                       <div className="relative inline-block w-full">
                                         <button
-                                          onClick={toggleDropdown}
+                                          onClick={() =>
+                                            setIsEventDropdownOpen(
+                                              (prev) => !prev,
+                                            )
+                                          }
                                           className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 px-3 py-2 text-base font-medium text-gray-700 dark:bg-gray-800"
                                         >
                                           {selectedEvent?.title ||
                                             'Select an event'}
                                           <svg
                                             className={`stroke-current duration-200 ease-in-out ${
-                                              isDropdownOpen ? 'rotate-180' : ''
+                                              isEventDropdownOpen
+                                                ? 'rotate-180'
+                                                : ''
                                             }`}
                                             width="20"
                                             height="20"
@@ -1077,8 +1094,10 @@ export const BookingsManagement = ({
                                         </button>
 
                                         <Dropdown
-                                          isOpen={isDropdownOpen}
-                                          onClose={closeDropdown}
+                                          isOpen={isEventDropdownOpen}
+                                          onClose={() =>
+                                            setIsEventDropdownOpen(false)
+                                          }
                                           className="absolute right-0 left-0 z-10 mt-1 max-h-60 overflow-y-auto rounded border bg-white shadow-lg"
                                         >
                                           {loading ? (
@@ -1096,7 +1115,11 @@ export const BookingsManagement = ({
                                                 onClick={() =>
                                                   handleEventChange(e)
                                                 }
-                                                className="cursor-pointer px-4 py-2 hover:bg-gray-100"
+                                                className={`cursor-pointer px-4 py-2 hover:bg-gray-100 ${
+                                                  selectedEvent?.id === e.id
+                                                    ? 'bg-gray-100 font-semibold'
+                                                    : ''
+                                                }`}
                                               >
                                                 <span className="font-medium">
                                                   {e.title}
@@ -1149,7 +1172,11 @@ export const BookingsManagement = ({
                               <Button
                                 className="bg-brand-500 cursor-pointer text-white"
                                 size="sm"
-                                onClick={handleBookingRegister}
+                                onClick={() =>
+                                  selectedEvent &&
+                                  handleBookingRegister(selectedEvent)
+                                }
+                                disabled={!selectedEvent}
                               >
                                 Create Booking
                               </Button>

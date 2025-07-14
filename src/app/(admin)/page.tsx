@@ -12,8 +12,8 @@ export default function AdminPage() {
   const [todaysEvents, setTodaysEvents] = useState<Event[]>([])
   const [eventsData, setEventsData] = useState<Event[]>([])
   const [todaysUsers, setTodaysUsers] = useState<User[]>([])
-  // const [loading, setLoading] = useState(false)
-  // const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   function isToday(dateStr: string) {
     const d = new Date(dateStr)
     const today = new Date()
@@ -26,22 +26,23 @@ export default function AdminPage() {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      // setLoading(true)
-      // setError(null)
+      setLoading(true)
+      setError(null)
       try {
         const res = await fetch('/api/bookings')
         const data = await res.json()
+        // console.log('data:', data)
         setBookingsData(data)
         const todaysBookings = data.filter((booking: Booking) =>
           isToday(booking.event.start_time),
         )
         setTodaysBookings(todaysBookings)
       } catch {
-        // setError('Failed to fetch bookings')
-        console.log('Failed to fetch bookings')
+        setError('Failed to fetch bookings')
+        // console.log('Failed to fetch bookings')
       } finally {
-        // setLoading(false)
-        console.log('Failed to fetch bookings')
+        setLoading(false)
+        // console.log('Failed to fetch bookings')
       }
     }
     const fetchCustomers = async () => {
