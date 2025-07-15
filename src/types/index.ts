@@ -7,6 +7,9 @@ export interface Booking {
   event: {
     title: string
     start_time: string
+    service_name: string
+    service_price: number
+    service_id: string
   }
   staff: {
     full_name: string

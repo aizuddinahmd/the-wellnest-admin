@@ -163,11 +163,27 @@ export async function GET() {
       .from('bookings')
       .select(
         `
-				*,
-				user:users (full_name, email),
-				event:events (title, start_time),
-				staff:staff (full_name)
-			`,
+      *,
+      event:events (
+        id,
+        start_time,
+        service_id,
+        service:services (
+          name,
+          service_pricing (
+            id,
+            price
+          )
+        )
+      ),
+      user:users (
+        full_name,
+        email
+      ),
+      staff:staff (
+        full_name
+      )
+    `,
       )
       .order('created_at', { ascending: false })
 

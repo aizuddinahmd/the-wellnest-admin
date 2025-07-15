@@ -46,8 +46,8 @@ export const BookingsManagement = ({
   title: string
   description: string
   bookingsData: Booking[]
-  usersData: User[]
-  eventsData: Event[]
+  usersData?: User[]
+  eventsData?: Event[]
 }) => {
   // const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -97,41 +97,10 @@ export const BookingsManagement = ({
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
-  // useEffect(() => {
-  //   const fetchBookings = async () => {
-  //     setLoading(true)
-  //     setError(null)
-  //     try {
-  //       const res = await fetch('/api/bookings')
-  //       const data = await res.json()
-  //       if (Array.isArray(data)) {
-  //         const filtered = data.filter(
-  //           (b: Booking) =>
-  //             b.event && b.event.start_time && isToday(b.event.start_time),
-  //         )
-  //         setBookings(filtered)
-  //       } else {
-  //         setError('Failed to fetch bookings')
-  //       }
-  //     } catch {
-  //       setError('Failed to fetch bookings')
-  //     } finally {
-  //       setLoading(false)
-  //     }
-  //   }
-  //   fetchBookings()
-  // }, [])
-
-  // const handleClassCreate = (e: React.FormEvent) => {
-  // 	e.preventDefault()
-  // 	// TODO: Replace with actual create logic
-  // 	console.log('Create class:', newClassName, 'for', modalCategory)
-  // 	handleCloseModal()
-  // }
   useEffect(() => {
     setBookings(bookingsData)
-    setCustomers(usersData)
-    setEvents(eventsData)
+    setCustomers(usersData ?? [])
+    setEvents(eventsData ?? [])
     setLoading(false)
     setError(null)
   }, [bookingsData, usersData, eventsData])
@@ -199,23 +168,6 @@ export const BookingsManagement = ({
     { value: 'other', label: 'Other' },
   ]
 
-  // const handleRaceChange = (value: string) => {
-  //   setRace(value)
-  // }
-  // const handleReligionChange = (value: string) => {
-  //   setReligion(value)
-  // }
-  // const handleGenderChange = (value: string) => {
-  //   setGender(value)
-  // }
-  // const handleNationalityChange = (value: string) => {
-  //   setNationality(value)
-  // }
-
-  // const handleCountryChange = (value: string) => {
-  //   setCountry(value)
-  // }
-
   const handleImageClick = () => {
     fileInputRef.current?.click()
   }
@@ -237,12 +189,7 @@ export const BookingsManagement = ({
   }
 
   const countries = [{ code: 'MY', label: '+60' }]
-  // const handlePhoneNumberChange = (phoneNumber: string) => {
-  //   setPhone(phoneNumber)
-  // }
-  // const handleEmailChange = (email: string) => {
-  //   setEmail(email)
-  // }
+
   const handleRadioChange = (value: string) => {
     setSelectedValue(value)
   }
@@ -278,41 +225,6 @@ export const BookingsManagement = ({
   function closeDropdown() {
     setIsDropdownOpen(false)
   }
-
-  // Register new customer
-  // const handleRegister = async (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   setRegistering(true)
-  //   setRegisterError(null)
-  //   setRegisterSuccess(null)
-  //   try {
-  //     const res = await fetch('/api/register-customer', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         name: registerName,
-  //         email: registerEmail,
-  //         phone: registerPhone,
-  //       }),
-  //     })
-  //     const data = await res.json()
-  //     if (!res.ok) {
-  //       setRegisterError(data.error || 'Registration failed')
-  //     } else {
-  //       setRegisterSuccess('Registration successful!')
-  //       setCustomers((prev) => [...prev, data.user])
-  //       setSelectedCustomer(data.user)
-  //       setShowRegisterModal(false)
-  //       setRegisterName('')
-  //       setRegisterEmail('')
-  //       setRegisterPhone('')
-  //     }
-  //   } catch {
-  //     setRegisterError('Registration failed')
-  //   } finally {
-  //     setRegistering(false)
-  //   }
-  // }
 
   const handleBookingRegister = async (selectedEvent: Event) => {
     setRegistering(true)
