@@ -33,7 +33,7 @@ import { useDropzone } from 'react-dropzone'
 import { ChevronDownIcon, EnvelopeIcon } from '../../icons'
 import Image from 'next/image'
 import Radio from '../form/input/Radio'
-// import CustomerRegistrationModal from '../bookings/CustomerRegistrationModal'
+import { CheckoutModal } from '../bookings/CheckoutModal'
 import { toast } from 'sonner'
 
 export const BookingsManagement = ({
@@ -88,6 +88,8 @@ export const BookingsManagement = ({
   const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false)
+  const [checkoutBooking, setCheckoutBooking] = useState<Booking | null>(null)
 
   useEffect(() => {
     setBookings(bookingsData)
@@ -362,7 +364,7 @@ export const BookingsManagement = ({
                   {booking.event.start_time}
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                  {booking.event.title}
+                  {events.find((e) => e.id === booking.event_id)?.title}
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                   {booking.notes}
@@ -373,18 +375,30 @@ export const BookingsManagement = ({
                   </Badge>
                 </TableCell>
                 <TableCell className="text-theme-sm relative px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                  <button
-                    type="button"
-                    className="dropdown-toggle"
-                    aria-label="Open actions"
-                    onClick={() =>
-                      setOpenDropdownId(
-                        openDropdownId === booking.id ? null : booking.id,
-                      )
-                    }
-                  >
-                    <Ellipsis className="h-4 w-4 cursor-pointer" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-green-600 text-white hover:bg-green-700"
+                      onClick={() => {
+                        setCheckoutBooking(booking)
+                        setShowCheckoutModal(true)
+                      }}
+                    >
+                      Checkout
+                    </Button>
+                    <button
+                      type="button"
+                      className="dropdown-toggle"
+                      aria-label="Open actions"
+                      onClick={() =>
+                        setOpenDropdownId(
+                          openDropdownId === booking.id ? null : booking.id,
+                        )
+                      }
+                    >
+                      <Ellipsis className="h-4 w-4 cursor-pointer" />
+                    </button>
+                  </div>
                   <Dropdown
                     isOpen={openDropdownId === booking.id}
                     onClose={() => setOpenDropdownId(null)}
@@ -1172,6 +1186,17 @@ export const BookingsManagement = ({
           </div>
         </div>
       </Modal>
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        isOpen={showCheckoutModal}
+        onClose={() => {
+          setShowCheckoutModal(false)
+          setCheckoutBooking(null)
+        }}
+        booking={checkoutBooking}
+        events={events}
+      />
     </>
   )
 }
