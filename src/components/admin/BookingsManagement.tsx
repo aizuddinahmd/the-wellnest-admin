@@ -34,6 +34,7 @@ import { ChevronDownIcon, EnvelopeIcon } from '../../icons'
 import Image from 'next/image'
 import Radio from '../form/input/Radio'
 import { CheckoutModal } from '../bookings/CheckoutModal'
+import { formatBookingTime } from '@/utils/dateTime'
 import { toast } from 'sonner'
 
 export const BookingsManagement = ({
@@ -361,7 +362,7 @@ export const BookingsManagement = ({
                   </span>
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
-                  {booking.event.start_time}
+                  {formatBookingTime(booking.event.start_time)}
                 </TableCell>
                 <TableCell className="text-theme-sm px-4 py-3 text-start text-gray-500 dark:text-gray-400">
                   {events.find((e) => e.id === booking.event_id)?.title}

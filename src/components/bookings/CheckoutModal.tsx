@@ -7,6 +7,7 @@ import Badge from '../ui/badge/Badge'
 import Radio from '../form/input/Radio'
 import { toast } from 'sonner'
 import { Booking, Event } from '@/types'
+import { formatBookingTime } from '@/utils/dateTime'
 
 interface CheckoutModalProps {
   isOpen: boolean
@@ -97,7 +98,7 @@ export const CheckoutModal = ({
             <div className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">Time:</span>
               <span className="font-medium text-gray-800 dark:text-white/90">
-                {booking.event.start_time}
+                {formatBookingTime(booking.event.start_time)}
               </span>
             </div>
             <div className="flex justify-between">
@@ -110,7 +111,10 @@ export const CheckoutModal = ({
             <div className="flex justify-between text-lg font-semibold">
               <span className="text-gray-800 dark:text-white/90">Total:</span>
               <span className="text-gray-800 dark:text-white/90">
-                RM {booking.event.service_price || '0.00'}
+                RM{' '}
+                {booking.event.service?.service_pricing?.[0]?.price?.toFixed(
+                  2,
+                ) || '0.00'}
               </span>
             </div>
           </div>
