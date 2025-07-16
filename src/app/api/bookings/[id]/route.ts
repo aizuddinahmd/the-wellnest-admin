@@ -10,14 +10,11 @@ export async function PATCH(
     const supabase = await createClient()
     const bookingId = params.id
 
-    // Update booking with payment information
+    // Update only booking status and notes (payment info goes to payments table via transactions)
     const { data, error } = await supabase
       .from('bookings')
       .update({
         status: body.status,
-        payment_method: body.payment_method,
-        payment_status: body.payment_status,
-        payment_date: body.payment_date,
         notes: body.notes || '',
       })
       .eq('id', bookingId)

@@ -28,26 +28,55 @@ export const CheckoutModal = ({
     if (!booking) return
 
     try {
-      // Here you would integrate with your payment processing API
-      // For now, we'll just simulate a successful payment
+      const selectedEvent = events.find((e) => e.id === booking.event_id)
+      const servicePrice =
+        booking.event.service?.service_pricing?.[0]?.price || 0
 
-      // Update booking status to 'confirmed' or 'paid'
-      const response = await fetch(`/api/bookings/${booking.id}`, {
-        method: 'PATCH',
+      // Create transaction with items and payment
+      const transactionData = {
+        user_id: booking.user_id || null,
+        booking_id: booking.id,
+        total_amount: servicePrice,
+        payment_method: paymentMethod,
+        reference_id: `REF-${Date.now()}`, // Generate a simple reference ID
+        items: [
+          {
+            service_id: selectedEvent?.service_id || booking.event_id,
+            quantity: 1,
+            unit_price: servicePrice,
+            label: `${booking.event.service?.name || selectedEvent?.title || 'Service'} - 1 session`,
+          },
+        ],
+      }
+
+      console.log('Creating transaction:', transactionData)
+
+      const response = await fetch('/api/transactions', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'confirmed',
-          payment_method: paymentMethod,
-          payment_status: 'paid',
-          payment_date: new Date().toISOString(),
-        }),
+        body: JSON.stringify(transactionData),
       })
 
+      const result = await response.json()
+
       if (response.ok) {
-        toast.success('Payment completed successfully!')
+        // Also update the booking status
+        await fetch(`/api/bookings/${booking.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'confirmed',
+            notes: `Payment completed via ${paymentMethod}`,
+          }),
+        })
+
+        toast.success(
+          `Payment completed successfully! Transaction ID: ${result.transaction.id}`,
+        )
         onClose()
       } else {
-        toast.error('Payment failed. Please try again.')
+        console.error('Transaction failed:', result)
+        toast.error(result.error || 'Payment failed. Please try again.')
       }
     } catch (error) {
       console.error('Payment error:', error)
