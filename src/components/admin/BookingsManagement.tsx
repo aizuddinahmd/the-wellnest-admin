@@ -457,32 +457,79 @@ export const BookingsManagement = ({
                   <div>
                     <Label>Search existing customer</Label>
                     <div className="relative inline-block w-full">
-                      <button
-                        onClick={toggleDropdown}
-                        className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 px-3 py-2 text-base font-medium text-gray-700 dark:bg-gray-800"
-                      >
-                        {selectedCustomer
-                          ? `${selectedCustomer.full_name} (${selectedCustomer.phone})`
-                          : 'Enter name, email or phone number'}
-                        <svg
-                          className={`stroke-current duration-200 ease-in-out ${
-                            isDropdownOpen ? 'rotate-180' : ''
-                          }`}
-                          width="20"
-                          height="20"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
+                      <div className="relative">
+                        <button
+                          onClick={toggleDropdown}
+                          className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 px-3 py-2 text-base font-medium text-gray-700 dark:bg-gray-800"
                         >
-                          <path
-                            d="M4.79199 7.396L10.0003 12.6043L15.2087 7.396"
-                            stroke=""
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
+                          {selectedCustomer
+                            ? `${selectedCustomer.full_name} (${selectedCustomer.phone})`
+                            : 'Enter name, email or phone number'}
+                          <svg
+                            className={`stroke-current duration-200 ease-in-out ${
+                              isDropdownOpen ? 'rotate-180' : ''
+                            }`}
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M4.79199 7.396L10.0003 12.6043L15.2087 7.396"
+                              stroke=""
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+
+                        {/* Clear button - only show when customer is selected */}
+                        {selectedCustomer && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedCustomer(null)
+                              setSearch('')
+                              setForm({
+                                name: '',
+                                nric: '',
+                                phone: '',
+                                email: '',
+                                dob: '',
+                                gender: '',
+                                nationality: '',
+                                race: '',
+                                religion: '',
+                                address: '',
+                                state: '',
+                                city: '',
+                                postcode: '',
+                                country: '',
+                                eventId: '',
+                                bookingType: 'one-off',
+                              })
+                              setStep('form')
+                            }}
+                            className="absolute top-1/2 right-10 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-gray-300 text-gray-600 hover:bg-gray-400 hover:text-gray-800 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
+                          >
+                            <svg
+                              className="h-3 w-3"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
 
                       <Dropdown
                         isOpen={isDropdownOpen}
@@ -565,39 +612,6 @@ export const BookingsManagement = ({
                     </span>
                     <div className="h-px flex-1 bg-gray-200" />
                   </div>
-                  {/* Clear selection button if customer is selected */}
-                  {/* {selectedCustomer && (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedCustomer(null)
-                        setSearch('')
-                        setForm({
-                          name: '',
-                          nric: '',
-                          phone: '',
-                          email: '',
-                          dob: '',
-                          gender: '',
-                          nationality: '',
-                          race: '',
-                          religion: '',
-                          address: '',
-                          state: '',
-                          city: '',
-                          postcode: '',
-                          country: '',
-                          eventId: '',
-                          bookingType: 'one-off',
-                        })
-                        setStep('form')
-                      }}
-                    >
-                      Clear Selection
-                    </Button>
-                  )} */}
 
                   {/* Add new customer button */}
                   <Button
@@ -1122,7 +1136,15 @@ export const BookingsManagement = ({
                                 variant="outline"
                                 className="cursor-pointer"
                                 size="sm"
-                                onClick={() => setStep('form')}
+                                onClick={() => {
+                                  if (selectedCustomer) {
+                                    // If customer was selected, go back to booking details modal
+                                    setShowRegisterModal(false)
+                                  } else {
+                                    // If new customer, go back to form step
+                                    setStep('form')
+                                  }
+                                }}
                               >
                                 Back
                               </Button>
