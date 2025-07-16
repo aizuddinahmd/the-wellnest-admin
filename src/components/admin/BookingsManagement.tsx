@@ -52,7 +52,6 @@ export const BookingsManagement = ({
   // const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const { isOpen, openModal, closeModal } = useModal()
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -79,17 +78,10 @@ export const BookingsManagement = ({
   const [step, setStep] = useState<'form' | 'summary'>('form')
   // const [personalDetails, setPersonalDetails] = useState<User | null>(null)
   // const [purpose, setPurpose] = useState<'Consultation' | 'OTC'>('Consultation')
-  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [customers, setCustomers] = useState<User[]>([])
   const [selectedCustomer, setSelectedCustomer] = useState<User | null>(null)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
-  // const [registerName, setRegisterName] = useState('')
-  // const [registerEmail, setRegisterEmail] = useState('')
-  // const [registerPhone, setRegisterPhone] = useState('')
-  const [registering, setRegistering] = useState(false)
-  const [registerError, setRegisterError] = useState<string | null>(null)
-  const [registerSuccess, setRegisterSuccess] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [selectedValue, setSelectedValue] = useState<string>('Consultation')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -102,7 +94,6 @@ export const BookingsManagement = ({
     setCustomers(usersData ?? [])
     setEvents(eventsData ?? [])
     setLoading(false)
-    setError(null)
   }, [bookingsData, usersData, eventsData])
 
   // Dropdown action handlers
@@ -168,18 +159,7 @@ export const BookingsManagement = ({
     { value: 'other', label: 'Other' },
   ]
 
-  const handleImageClick = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0])
-    }
-  }
-
-  const handleNext = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleNext = () => {
     // Collect all details into an object
     const details = {
       imageUrl,
@@ -203,7 +183,7 @@ export const BookingsManagement = ({
   )
 
   // Open dropdown when input is focused
-  const handleInputFocus = () => setDropdownOpen(true)
+  // const handleInputFocus = () => setIsDropdownOpen(true)
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -211,7 +191,7 @@ export const BookingsManagement = ({
         inputRef.current &&
         !inputRef.current.contains(event.target as Node)
       ) {
-        setDropdownOpen(false)
+        setIsDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -227,9 +207,9 @@ export const BookingsManagement = ({
   }
 
   const handleBookingRegister = async (selectedEvent: Event) => {
-    setRegistering(true)
-    setRegisterError(null)
-    setRegisterSuccess(null)
+    // setRegistering(true)
+    // setRegisterError(null)
+    // setRegisterSuccess(null)
     try {
       // 1. Ensure user exists (by email or phone)
       let userId = selectedCustomer?.id
@@ -260,8 +240,10 @@ export const BookingsManagement = ({
           toast.error(userData.error || 'User registration failed')
           throw new Error(userData.error || 'User creation failed')
         }
-        toast.success('User registered successfully!')
+        toast.success('User registered successfully')
         userId = userData.id
+      } else {
+        toast.success(`Booking for ${selectedCustomer?.full_name}`)
       }
 
       // 2. Create booking and decrement event capacity atomically (backend should handle this)
@@ -287,11 +269,7 @@ export const BookingsManagement = ({
       // Optionally, refresh bookings list here
       closeModal()
     } catch (error) {
-      setRegisterError(
-        error instanceof Error ? error.message : 'Booking failed',
-      )
-    } finally {
-      setRegistering(false)
+      toast.error(error instanceof Error ? error.message : 'Booking failed')
     }
   }
 
@@ -483,7 +461,9 @@ export const BookingsManagement = ({
                         onClick={toggleDropdown}
                         className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-300 px-3 py-2 text-base font-medium text-gray-700 dark:bg-gray-800"
                       >
-                        Enter name, email or phone number
+                        {selectedCustomer
+                          ? `${selectedCustomer.full_name} (${selectedCustomer.phone})`
+                          : 'Enter name, email or phone number'}
                         <svg
                           className={`stroke-current duration-200 ease-in-out ${
                             isDropdownOpen ? 'rotate-180' : ''
@@ -537,7 +517,28 @@ export const BookingsManagement = ({
                               onClick={() => {
                                 setSelectedCustomer(c)
                                 setSearch(`${c.full_name} (${c.phone})`)
-                                setDropdownOpen(false)
+                                setIsDropdownOpen(false)
+                                // Auto-populate form with existing customer data
+                                setForm({
+                                  ...form,
+                                  name: c.full_name || '',
+                                  nric: c.nric || '',
+                                  phone: c.phone || '',
+                                  email: c.email || '',
+                                  dob: c.dob || '',
+                                  gender: c.gender || '',
+                                  nationality: c.nationality || '',
+                                  race: c.race || '',
+                                  religion: c.religion || '',
+                                  address: c.address || '',
+                                  state: c.state || '',
+                                  city: c.city || '',
+                                  postcode: c.postcode || '',
+                                  country: c.country || '',
+                                })
+                                // Skip to booking details step
+                                setStep('summary')
+                                setShowRegisterModal(true)
                               }}
                               className="flex cursor-pointer flex-col items-start px-3 py-2 hover:bg-gray-100"
                             >
@@ -564,6 +565,40 @@ export const BookingsManagement = ({
                     </span>
                     <div className="h-px flex-1 bg-gray-200" />
                   </div>
+                  {/* Clear selection button if customer is selected */}
+                  {/* {selectedCustomer && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedCustomer(null)
+                        setSearch('')
+                        setForm({
+                          name: '',
+                          nric: '',
+                          phone: '',
+                          email: '',
+                          dob: '',
+                          gender: '',
+                          nationality: '',
+                          race: '',
+                          religion: '',
+                          address: '',
+                          state: '',
+                          city: '',
+                          postcode: '',
+                          country: '',
+                          eventId: '',
+                          bookingType: 'one-off',
+                        })
+                        setStep('form')
+                      }}
+                    >
+                      Clear Selection
+                    </Button>
+                  )} */}
+
                   {/* Add new customer button */}
                   <Button
                     className="w-full"
@@ -581,8 +616,18 @@ export const BookingsManagement = ({
                     className="max-w-[1000px] p-6 lg:p-10"
                   >
                     <div className="custom-scrollbar flex max-h-[80vh] flex-col overflow-y-auto px-2">
-                      {/* Customer registration modal */}
+                      {/* Bookings Form */}
                       <div>
+                        <div className="mb-6">
+                          <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90">
+                            Bookings Form
+                          </h2>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {selectedCustomer
+                              ? `Create booking for ${selectedCustomer.full_name}`
+                              : 'Register new customer and create booking'}
+                          </p>
+                        </div>
                         {step === 'form' ? (
                           <form onSubmit={handleNext}>
                             <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
